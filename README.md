@@ -55,6 +55,10 @@ deploy the cloud function.
 gcloud functions deploy <FUNCTION NAME> --entry-point main --trigger-http --runtime python39 --env-vars-file .env.yml
 ```
 
+## Support
+
+These scripts are provided as examples and are not officially supported. We welcome feedback on how we can improve them. To submit feedback, go to the [Chronicle Ingestion Script documentation](https://cloud.google.com/chronicle/docs/ingestion/ingest-using-cloud-functions) and click "Send Feedback".
+
 ## Resources
 
 - [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install)
