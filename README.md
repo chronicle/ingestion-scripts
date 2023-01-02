@@ -4,34 +4,42 @@
 
 ### Setting up the directory
 
-Create a new directory for the cloud function deployment and add the
-following files into that directory:
+Create a new directory for the cloud function deployment and add the following
+files into that directory:
 
-1. *Contents* of the desired platform (i.e. `OneLogin_User`)
-2. `dist` directory
+1.  *Contents* of the desired platform (i.e. `OneLogin_User`)
+2.  `common` directory
 
 ### Setting the required runtime environment variables
 
-Edit the .env.yml file to populate all the required environment variables. 
-Information related to all the environment variables can be found in the 
+Edit the .env.yml file to populate all the required environment variables.
+Information related to all the environment variables can be found in the
 README.md file.
 
 #### Common runtime environment variables
 
-Following is the table listing all the Chronicle related runtime environment 
+Following is the table listing all the Chronicle related runtime environment
 variables that must be configured for all the ingestion scripts.
 
-| Variable                  | Description                                         | Required | Default | Secret |
-| ------------------------- | --------------------------------------------------- | -------- | ------- | ------ |
-| POLL_INTERVAL             | Poll interval for the cloud function.               | Yes      | -       | No     |
-| CHRONICLE_CUSTOMER_ID     | Chronicle customer Id.                              | Yes      | -       | No     |
-| CHRONICLE_REGION          | Chronicle region.                                   | Yes      | us      | No     |
-| CHRONICLE_SERVICE_ACCOUNT | Contents of the Chronicle ServiceAccount JSON file. | Yes      | -       | Yes    |
+| Variable                  | Description    | Required | Default | Secret |
+| ------------------------- | -------------- | -------- | ------- | ------ |
+| POLL_INTERVAL             | Poll interval  | Yes      | -       | No     |
+:                           : for the cloud  :          :         :        :
+:                           : function.      :          :         :        :
+| CHRONICLE_CUSTOMER_ID     | Chronicle      | Yes      | -       | No     |
+:                           : customer Id.   :          :         :        :
+| CHRONICLE_REGION          | Chronicle      | Yes      | us      | No     |
+:                           : region.        :          :         :        :
+| CHRONICLE_SERVICE_ACCOUNT | Contents of    | Yes      | -       | Yes    |
+:                           : the Chronicle  :          :         :        :
+:                           : ServiceAccount :          :         :        :
+:                           : JSON file.     :          :         :        :
 
 #### Using secrets
 
 Environment variables marked as **Secret** must be configured as secrets on
-Google Secret Manager. Refer [this](https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#create)
+Google Secret Manager. Refer
+[this](https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#create)
 page to learn how to create secrets.
 
 Once the secrets are created on Secret Manager, use the secret's resource name
@@ -48,7 +56,7 @@ setting the `CHRONICLE_NAMESPACE` environment variable.
 
 ### Deploying the cloud function
 
-Execute the following command from inside the previously created directory to 
+Execute the following command from inside the previously created directory to
 deploy the cloud function.
 
 ```
@@ -57,9 +65,12 @@ gcloud functions deploy <FUNCTION NAME> --entry-point main --trigger-http --runt
 
 ## Support
 
-These scripts are provided as examples and are not officially supported. We welcome feedback on how we can improve them. To submit feedback, go to the [Chronicle Ingestion Script documentation](https://cloud.google.com/chronicle/docs/ingestion/ingest-using-cloud-functions) and click "Send Feedback".
+These scripts are provided as examples and are not officially supported. We
+welcome feedback on how we can improve them. To submit feedback, go to the
+[Chronicle Ingestion Script documentation](https://cloud.google.com/chronicle/docs/ingestion/ingest-using-cloud-functions)
+and click "Send Feedback".
 
 ## Resources
 
-- [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install)
-- [Deploying cloud functions from local machine](https://cloud.google.com/functions/docs/deploying/filesystem)
+-   [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install)
+-   [Deploying cloud functions from local machine](https://cloud.google.com/functions/docs/deploying/filesystem)

@@ -1,0 +1,42 @@
+<taxii_11:Poll_Response xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1" xmlns:taxii_11="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns:tdq="http://taxii.mitre.org/query/taxii_default_query-1" message_id="2420153305147462664" in_response_to="42158" collection_name="H-ISAC WHITE" more="false" result_part_number="1">
+    <taxii_11:Exclusive_Begin_Timestamp>2022-11-01T00:00:00+00:00</taxii_11:Exclusive_Begin_Timestamp>
+    <taxii_11:Inclusive_End_Timestamp>2022-11-02T00:00:00+00:00</taxii_11:Inclusive_End_Timestamp>
+    <taxii_11:Record_Count partial_count="false">1</taxii_11:Record_Count>
+    <taxii_11:Content_Block>
+        <taxii_11:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1.1"/>
+        <taxii_11:Content>
+            <stix:STIX_Package xmlns:DomainNameObj="https://cybox.mitre.org/objects#DomainNameObject-1" xmlns:stixCommon="http://stix.mitre.org/common-1" xmlns:cybox="https://cybox.mitre.org/cybox-2" xmlns:stix="http://stix.mitre.org/stix-1" xmlns:indicator="http://stix.mitre.org/Indicator-2" xmlns:cyboxCommon="https://cybox.mitre.org/common-2" xmlns:ctix="https://test.com" xmlns:xlink="https://www.w3.org/1999/xlink" xmlns:ds="https://www.w3.org/2000/09/xmldsig#" xmlns:xs="https://www.w3.org/2001/XMLSchema" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" id="bundle--2d9ccdb6-431f-4ad4-89b1-fc4293873241" version="1.1.1">
+                <stix:Indicators>
+                    <stix:Indicator id="id1" timestamp="2022-11-01T15:11:46.630000+00:00" xsi:type="indicator:IndicatorType" version="2.1.1">
+                        <indicator:Title>mal_domain: test.com</indicator:Title>
+                        <indicator:Type>malicious-activity</indicator:Type>
+                        <indicator:Type>mal_domain</indicator:Type>
+                        <indicator:Description>test description</indicator:Description>
+                        <indicator:Valid_Time_Position>
+                            <indicator:Start_Time precision="second">2022-09-12T15:50:21.286000+00:00</indicator:Start_Time>
+                            <indicator:End_Time precision="second">9999-12-31T00:00:00+00:00</indicator:End_Time>
+                        </indicator:Valid_Time_Position>
+                        <indicator:Confidence timestamp="2022-11-01T15:16:13.980380+00:00">
+                            <stixCommon:Value>High</stixCommon:Value>
+                        </indicator:Confidence>
+                    </stix:Indicator>
+                    <stix:Indicator id="id2" timestamp="2022-11-01T15:11:46.613000+00:00" xsi:type="indicator:IndicatorType" version="2.1.1">
+                        <indicator:Title>mal_domain: demo.com</indicator:Title>
+                        <indicator:Type>malicious-activity</indicator:Type>
+                        <indicator:Type>mal_domain</indicator:Type>
+                        <indicator:Description>test description 2</indicator:Description>
+                        <indicator:Valid_Time_Position>
+                            <indicator:Start_Time precision="second">2022-09-12T15:50:21.048000+00:00</indicator:Start_Time>
+                            <indicator:End_Time precision="second">9999-12-31T00:00:00+00:00</indicator:End_Time>
+                        </indicator:Valid_Time_Position>
+                        <indicator:Confidence timestamp="2022-11-01T15:16:13.983765+00:00">
+                            <stixCommon:Value>High</stixCommon:Value>
+                        </indicator:Confidence>
+                    </stix:Indicator>
+                </stix:Indicators>
+            </stix:STIX_Package>
+        </taxii_11:Content>
+        <taxii_11:Timestamp_Label>2022-11-01T15:16:14.021157+00:00</taxii_11:Timestamp_Label>
+        <taxii_11:Padding></taxii_11:Padding>
+    </taxii_11:Content_Block>
+</taxii_11:Poll_Response>

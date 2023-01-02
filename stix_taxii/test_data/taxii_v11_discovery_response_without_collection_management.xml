@@ -1,0 +1,14 @@
+<taxii_11:Discovery_Response xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1" xmlns:taxii_11="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns:tdq="http://taxii.mitre.org/query/taxii_default_query-1" message_id="4311166738059194005" in_response_to="1">
+    <taxii_11:Service_Instance service_type="DISCOVERY" service_version="urn:taxii.mitre.org:services:1.1" available="true">
+        <taxii_11:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</taxii_11:Protocol_Binding>
+        <taxii_11:Address>https://dummy.com/taxii/</taxii_11:Address>
+        <taxii_11:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</taxii_11:Message_Binding>
+        <taxii_11:Message>Test Server Discovery Service</taxii_11:Message>
+    </taxii_11:Service_Instance>
+    <taxii_11:Service_Instance service_type="POLL" service_version="urn:taxii.mitre.org:services:1.1" available="true">
+        <taxii_11:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</taxii_11:Protocol_Binding>
+        <taxii_11:Address>https://dummy.com/taxii/poll/</taxii_11:Address>
+        <taxii_11:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</taxii_11:Message_Binding>
+        <taxii_11:Message>Test poll service</taxii_11:Message>
+    </taxii_11:Service_Instance>
+</taxii_11:Discovery_Response>

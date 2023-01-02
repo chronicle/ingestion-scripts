@@ -1,0 +1,27 @@
+<taxii_11:Collection_Information_Response xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1" xmlns:taxii_11="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns:tdq="http://taxii.mitre.org/query/taxii_default_query-1" message_id="6159560408282964888" in_response_to="26300">
+    <taxii_11:Collection collection_name="test" collection_type="DATA_FEED" available="true">
+        <taxii_11:Description>test collection</taxii_11:Description>
+        <taxii_11:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1.1"/>
+        <taxii_11:Content_Binding binding_id="urn:stix.mitre.org:xml:1.2"/>
+        <taxii_11:Polling_Service>
+            <taxii_11:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</taxii_11:Protocol_Binding>
+            <taxii_11:Address>https://dummy.com/taxii/poll/</taxii_11:Address>
+            <taxii_11:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</taxii_11:Message_Binding>
+        </taxii_11:Polling_Service>
+        <taxii_11:Receiving_Inbox_Service>
+            <taxii_11:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</taxii_11:Protocol_Binding>
+            <taxii_11:Address>https://dummy.com/taxii/inbox/</taxii_11:Address>
+            <taxii_11:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</taxii_11:Message_Binding>
+        </taxii_11:Receiving_Inbox_Service>
+    </taxii_11:Collection>
+    <taxii_11:Collection collection_name="test2" collection_type="DATA_FEED" available="true">
+        <taxii_11:Description>test2 collection</taxii_11:Description>
+        <taxii_11:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1.1"/>
+        <taxii_11:Content_Binding binding_id="urn:stix.mitre.org:xml:1.2"/>
+        <taxii_11:Polling_Service>
+            <taxii_11:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</taxii_11:Protocol_Binding>
+            <taxii_11:Address>https://dummy.com/taxii/poll/</taxii_11:Address>
+            <taxii_11:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</taxii_11:Message_Binding>
+        </taxii_11:Polling_Service>
+    </taxii_11:Collection>
+</taxii_11:Collection_Information_Response>

@@ -1,0 +1,4 @@
+<taxii_11:Poll_Response xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1" xmlns:taxii_11="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns:tdq="http://taxii.mitre.org/query/taxii_default_query-1" message_id="6236874738171617213" in_response_to="42158" collection_name="test" more="false" result_part_number="1">
+    <taxii_11:Exclusive_Begin_Timestamp>2022-11-14T00:00:00+00:00</taxii_11:Exclusive_Begin_Timestamp>
+    <taxii_11:Record_Count partial_count="false">0</taxii_11:Record_Count>
+</taxii_11:Poll_Response>
