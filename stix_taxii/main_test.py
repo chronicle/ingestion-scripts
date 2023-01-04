@@ -28,8 +28,8 @@ INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.stix_taxii import main  # pylint: disable=g-import-not-at-top
-from google3.third_party.chronicle.ingestion_scripts.stix_taxii import taxii_client
+from stix_taxii import main  # pylint: disable=g-import-not-at-top
+from stix_taxii import taxii_client
 # copybara:strip_end
 
 # Test value for poll interval.

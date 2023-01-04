@@ -35,7 +35,7 @@ sys.modules["{}.common.ingest".format(
     INGESTION_SCRIPTS_PATH)] = mock.MagicMock()
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.box_events import main  # pylint: disable=g-import-not-at-top
+from box_events import main  # pylint: disable=g-import-not-at-top
 # copybara:strip_end
 
 
@@ -170,7 +170,7 @@ class TestBoxIngestion(googletest.TestCase):
       main.main(request="")
 
   @mock.patch(
-      "google3.third_party.chronicle.ingestion_scripts.box_events.main.datetime"
+      "box_events.main.datetime"
   )
   def test_log_retrieve_time(self, mocked_datetime, unused_mocked_ingest,
                              mocked_send, mocked_get_last_run_at,

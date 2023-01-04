@@ -20,7 +20,7 @@ from typing import Callable, Optional
 import jwt
 import requests
 
-from google3.third_party.chronicle.ingestion_scripts.common import status
+from common import status
 
 # Default timeout for requests in seconds.
 DEFAULT_TIMEOUT = 60

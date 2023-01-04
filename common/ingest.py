@@ -23,8 +23,8 @@ import google3
 from google.auth.transport import requests as Requests
 from google.oauth2 import service_account
 
-from google3.third_party.chronicle.ingestion_scripts.common import env_constants
-from google3.third_party.chronicle.ingestion_scripts.common import utils
+from common import env_constants
+from common import utils
 
 AUTHORIZATION_SCOPES = ["https://www.googleapis.com/auth/malachite-ingestion"]
 CUSTOMER_ID = utils.get_env_var(env_constants.ENV_CHRONICLE_CUSTOMER_ID)

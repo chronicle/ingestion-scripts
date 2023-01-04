@@ -29,7 +29,7 @@ INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.slack import main  # pylint: disable=g-import-not-at-top
+from slack import main  # pylint: disable=g-import-not-at-top
 # copybara:strip_end
 
 

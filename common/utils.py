@@ -20,7 +20,7 @@ from typing import Any
 
 from google.cloud import secretmanager
 
-from google3.third_party.chronicle.ingestion_scripts.common import env_constants
+from common import env_constants
 
 
 def get_env_var(

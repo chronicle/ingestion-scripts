@@ -32,7 +32,7 @@ INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.citrix_auditlogs import main  # pylint: disable=g-import-not-at-top
+from citrix_auditlogs import main  # pylint: disable=g-import-not-at-top
 # copybara:strip_end
 
 

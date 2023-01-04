@@ -22,11 +22,11 @@ from google3.testing.pybase import googletest
 # copybara:strip_end
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.common import auth
+from common import auth
 # copybara:strip_end
 
 # Path to common framework.
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts.common"
+INGESTION_SCRIPTS_PATH = "common"
 
 
 # copybara:insert(imports) class TestAuthMethod(unittest.TestCase):

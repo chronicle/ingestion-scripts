@@ -15,9 +15,9 @@
 """Fetch indicators from the STIX/TAXII Server and ingest into Chronicle."""
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.common import ingest
-from google3.third_party.chronicle.ingestion_scripts.common import utils
-from google3.third_party.chronicle.ingestion_scripts.stix_taxii import taxii_client
+from common import ingest
+from common import utils
+from stix_taxii import taxii_client
 # copybara:strip_end
 
 # Environment variable constants.

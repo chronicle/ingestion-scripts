@@ -22,8 +22,8 @@ from typing import Any, Dict, List, Union
 from google.cloud import pubsub_v1
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.common import env_constants
-from google3.third_party.chronicle.ingestion_scripts.common import ingest
+from common import env_constants
+from common import ingest
 # copybara:strip_end
 
 # Default initialization of variable.

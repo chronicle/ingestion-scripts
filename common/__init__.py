@@ -14,7 +14,7 @@
 #
 """Common module for Chronicle ingestion scripts."""
 
-from google3.third_party.chronicle.ingestion_scripts.common import auth
-from google3.third_party.chronicle.ingestion_scripts.common import status
-from google3.third_party.chronicle.ingestion_scripts.common import utils
-from google3.third_party.chronicle.ingestion_scripts.common.ingest import ingest
+from common import auth
+from common import status
+from common import utils
+from common.ingest import ingest

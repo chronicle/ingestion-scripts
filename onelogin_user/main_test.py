@@ -36,7 +36,7 @@ sys.modules['{}.common.ingest'.format(
     INGESTION_SCRIPTS_PATH)] = mock.MagicMock()
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.onelogin_user import main  # pylint: disable=g-import-not-at-top
+from onelogin_user import main  # pylint: disable=g-import-not-at-top
 # copybara:strip_end
 
 

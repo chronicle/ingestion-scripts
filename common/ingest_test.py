@@ -25,7 +25,7 @@ from google3.testing.pybase import googletest
 # copybara:strip_end
 
 # Path to common framework.
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts.common"
+INGESTION_SCRIPTS_PATH = "common"
 
 sys.path.append(
     os.path.sep.join(
@@ -38,7 +38,7 @@ with mock.patch(
   # environment variables at the start of the file. Hence, this file will need
   # to be imported after mocking the function `get_env_var()`
   # copybara:strip_begin(imports)
-  from google3.third_party.chronicle.ingestion_scripts.common import ingest  # pylint: disable=g-import-not-at-top
+  from common import ingest  # pylint: disable=g-import-not-at-top
   # copybara:strip_end
 
 

@@ -28,7 +28,7 @@ INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.duo_admin import main  # pylint: disable=g-import-not-at-top
+from duo_admin import main  # pylint: disable=g-import-not-at-top
 # copybara:strip_end
 
 

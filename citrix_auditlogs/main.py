@@ -19,11 +19,11 @@ import datetime
 import requests
 
 # copybara:strip_begin(imports)
-from google3.third_party.chronicle.ingestion_scripts.common import auth
-from google3.third_party.chronicle.ingestion_scripts.common import env_constants
-from google3.third_party.chronicle.ingestion_scripts.common import ingest
-from google3.third_party.chronicle.ingestion_scripts.common import status
-from google3.third_party.chronicle.ingestion_scripts.common import utils
+from common import auth
+from common import env_constants
+from common import ingest
+from common import status
+from common import utils
 # copybara:strip_end
 
 # Environment variables name.
