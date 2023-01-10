@@ -19,24 +19,18 @@
 import datetime
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 
 import requests
 
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
 
-
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
-
-sys.modules["{}.common.ingest".format(
+sys.modules["{}common.ingest".format(
     INGESTION_SCRIPTS_PATH)] = mock.MagicMock()
 
-# copybara:strip_begin(imports)
-from box_events import main  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
+import main
 
 
 def get_mock_response():
@@ -47,15 +41,14 @@ def get_mock_response():
   return response
 
 
-# copybara:insert(imports) class TestBoxIngestion(unittest.TestCase):
-@mock.patch("{}.box_events.main.utils.get_env_var".format(
-    INGESTION_SCRIPTS_PATH))
-@mock.patch("{}.box_events.main.utils.get_last_run_at".format(
-    INGESTION_SCRIPTS_PATH))
+@mock.patch("{}main.utils.get_env_var".format(
+    SCRIPT_PATH))
+@mock.patch("{}main.utils.get_last_run_at".format(
+    SCRIPT_PATH))
 @mock.patch(
-    "{}.common.auth.requests.Session.send".format(INGESTION_SCRIPTS_PATH))
-@mock.patch("{}.box_events.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
-class TestBoxIngestion(googletest.TestCase):
+    "{}common.auth.requests.Session.send".format(INGESTION_SCRIPTS_PATH))
+@mock.patch("{}main.ingest.ingest".format(SCRIPT_PATH))
+class TestBoxIngestion(unittest.TestCase):
   """Unit test case class for box event."""
 
   def test_no_logs_to_ingest(self, mocked_ingest, mocked_send,
@@ -76,7 +69,7 @@ class TestBoxIngestion(googletest.TestCase):
 
     self.assertEqual(mocked_ingest.call_count, 0)
 
-  @mock.patch("{}.box_events.main.datetime".format(INGESTION_SCRIPTS_PATH))
+  @mock.patch("{}main.datetime".format(SCRIPT_PATH))
   def test_pagination(self, mocked_datetime, mocked_ingest, mocked_send,
                       mocked_get_last_run_at, unused_mocked_get_env_var):
     """Test case to verify the pagination mechanism."""
@@ -169,9 +162,7 @@ class TestBoxIngestion(googletest.TestCase):
     with self.assertRaises(requests.HTTPError):
       main.main(request="")
 
-  @mock.patch(
-      "box_events.main.datetime"
-  )
+  @mock.patch("{}main.datetime".format(SCRIPT_PATH))
   def test_log_retrieve_time(self, mocked_datetime, unused_mocked_ingest,
                              mocked_send, mocked_get_last_run_at,
                              unused_mocked_get_env_var):

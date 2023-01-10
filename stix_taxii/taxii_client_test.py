@@ -17,21 +17,13 @@
 import io
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 
 import requests_mock
 
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
-
 INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
-
-# copybara:strip_begin(imports)
-from stix_taxii import taxii_client  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
 
 # Headers constants.
 TAXII_V21_HEADERS = {"Content-Type": "application/taxii+json;version=2.1"}
@@ -64,7 +56,7 @@ TEST_USERNAME = "test_username"
 TEST_PASSWORD = "test_password"
 
 
-# copybara:insert(imports) class TestTaxiiClientVersion11(unittest.TestCase):
+class TestTaxiiClientVersion11(unittest.TestCase):
 class TestTaxiiClientVersion11(googletest.TestCase):
   """Test cases for TAXII Client version 1.1."""
 
@@ -165,7 +157,7 @@ class TestTaxiiClientVersion11(googletest.TestCase):
                       taxii_client.TAXII_VERSION_11, "test")
 
 
-# copybara:insert(imports) class TestTaxiiClientVersion20(unittest.TestCase):
+class TestTaxiiClientVersion20(unittest.TestCase):
 class TestTaxiiClientVersion20(googletest.TestCase):
   """Test cases for TAXII Client version 2.0."""
 
@@ -250,7 +242,7 @@ class TestTaxiiClientVersion20(googletest.TestCase):
         [])
 
 
-# copybara:insert(imports) class TestTaxiiClientVersion21(unittest.TestCase):
+class TestTaxiiClientVersion21(unittest.TestCase):
 class TestTaxiiClientVersion21(googletest.TestCase):
   """Test cases for TAXII Client version 2.1."""
 

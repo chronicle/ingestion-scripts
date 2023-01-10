@@ -17,19 +17,11 @@ import datetime
 import sys
 import time
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
-
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
 
 INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
-
-# copybara:strip_begin(imports)
-from duo_admin import main  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
 
 
 def mock_get_env_var(*args, **unused_kwargs):
@@ -52,7 +44,7 @@ def mock_get_env_var(*args, **unused_kwargs):
     return "test"
 
 
-# copybara:insert(imports) class TestDuoAdminIngestion(unittest.TestCase):
+class TestDuoAdminIngestion(unittest.TestCase):
 @mock.patch(
     f"{INGESTION_SCRIPTS_PATH}.duo_admin.main.utils.get_env_var",
     side_effect=mock_get_env_var)

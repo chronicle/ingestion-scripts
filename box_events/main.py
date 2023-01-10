@@ -17,11 +17,9 @@
 import datetime
 import requests
 
-# copybara:strip_begin(imports)
 from common import auth
 from common import ingest
 from common import utils
-# copybara:strip_end
 
 # Default page size to fetch events from box.
 PAGE_SIZE = 100

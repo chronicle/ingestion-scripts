@@ -16,21 +16,13 @@
 
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 
 import requests
 
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
-
 INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
-
-# copybara:strip_begin(imports)
-from misp import main  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
 
 
 def get_mock_response():
@@ -97,7 +89,7 @@ _test_key_to_remove_entity = {
 }
 
 
-# copybara:insert(imports) class TestMISPIngestion(unittest.TestCase):
+class TestMISPIngestion(unittest.TestCase):
 @mock.patch(
     "{}.misp.main.utils.get_env_var".format(INGESTION_SCRIPTS_PATH),
     return_value="test")

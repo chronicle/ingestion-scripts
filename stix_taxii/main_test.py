@@ -17,20 +17,11 @@
 import datetime
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
-
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
 
 INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
-
-# copybara:strip_begin(imports)
-from stix_taxii import main  # pylint: disable=g-import-not-at-top
-from stix_taxii import taxii_client
-# copybara:strip_end
 
 # Test value for poll interval.
 TEST_POLL_INTERVAL = 15
@@ -48,7 +39,7 @@ def get_mock_response() -> mock.Mock:
   return response
 
 
-# copybara:insert(imports) class TestTaxiiClientVersion11(unittest.TestCase):
+class TestTaxiiClientVersion11(unittest.TestCase):
 class TestStixTaxiiIngestion(googletest.TestCase):
   """Test cases for the main function."""
 

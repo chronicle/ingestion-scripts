@@ -18,15 +18,11 @@ import datetime
 import sys
 
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 
 from google.auth.transport import requests
 import requests as req
-
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
 
 
 INGESTION_SCRIPTS_PATH = 'google3.third_party.chronicle.ingestion_scripts'
@@ -34,10 +30,6 @@ INGESTION_SCRIPTS_PATH = 'google3.third_party.chronicle.ingestion_scripts'
 # Mock the chronicle library
 sys.modules['{}.common.ingest'.format(
     INGESTION_SCRIPTS_PATH)] = mock.MagicMock()
-
-# copybara:strip_begin(imports)
-from onelogin_user import main  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
 
 
 def mock_get_env_var(*args, **kwargs):  # pylint: disable=unused-argument
@@ -48,7 +40,7 @@ def mock_get_env_var(*args, **kwargs):  # pylint: disable=unused-argument
     return 'test'
 
 
-# copybara:insert(imports) class TestGetUsersFromOneLogin(unittest.TestCase):
+class TestGetUsersFromOneLogin(unittest.TestCase):
 @mock.patch(
     '{}.onelogin_user.main.utils.get_env_var'.format(
         INGESTION_SCRIPTS_PATH), side_effect=mock_get_env_var)

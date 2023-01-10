@@ -17,20 +17,12 @@
 import datetime
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 import requests
 
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
-
 INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
-
-# copybara:strip_begin(imports)
-from slack import main  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
 
 
 def mock_get_env_var(*args, **unused_kwargs):
@@ -71,7 +63,7 @@ def get_mock_response():
   return response
 
 
-# copybara:insert(imports) class TestSlackIngestion(unittest.TestCase):
+class TestSlackIngestion(unittest.TestCase):
 @mock.patch(
     "{}.slack.main.utils.get_env_var".format(INGESTION_SCRIPTS_PATH),
     side_effect=mock_get_env_var)

@@ -19,7 +19,6 @@ import os
 import sys
 from typing import Any, Dict, List, Optional, Sequence
 
-import google3
 from google.auth.transport import requests as Requests
 from google.oauth2 import service_account
 

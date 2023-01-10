@@ -17,12 +17,8 @@
 import os
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
-
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
 
 # Path to common framework.
 INGESTION_SCRIPTS_PATH = "common"
@@ -37,13 +33,10 @@ with mock.patch(
   # Disabling the import error because ingest.py file fetches value of some
   # environment variables at the start of the file. Hence, this file will need
   # to be imported after mocking the function `get_env_var()`
-  # copybara:strip_begin(imports)
   from common import ingest  # pylint: disable=g-import-not-at-top
-  # copybara:strip_end
 
 
-# copybara:insert(imports) class TestIngestMethod(unittest.TestCase):
-class TestIngestMethod(googletest.TestCase):
+class TestIngestMethod(unittest.TestCase):
   """Unit test class for ingest."""
 
   @mock.patch(f"{INGESTION_SCRIPTS_PATH}.ingest._send_logs_to_chronicle")

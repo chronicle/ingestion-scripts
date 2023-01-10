@@ -19,12 +19,6 @@ import json
 
 import duo_client
 
-# copybara:strip_begin(imports)
-from common import env_constants
-from common import ingest
-from common import utils
-# copybara:strip_end
-
 # Log type to push data into Chronicle.
 CHRONICLE_DATA_TYPE = "DUO_ADMIN"
 

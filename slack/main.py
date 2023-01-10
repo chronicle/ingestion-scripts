@@ -17,12 +17,6 @@
 import datetime
 import requests
 
-# copybara:strip_begin(imports)
-from common import ingest
-from common import status
-from common import utils
-# copybara:strip_end
-
 # Log type to push data into Chronicle.
 CHRONICLE_DATA_TYPE = "SLACK_AUDIT"
 

@@ -17,23 +17,15 @@
 import json
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
-
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
 
 INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 
 sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
 
-# copybara:strip_begin(imports)
-from pubsub import main  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
 
-
-# copybara:insert(imports) class TestGooglePubSubBuildPayload(unittest.TestCase):
+class TestGooglePubSubBuildPayload(unittest.TestCase):
 @mock.patch("{}.pubsub.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
 class TestGooglePubSubMain(googletest.TestCase):
   """Test cases to verify the functioning of "build_and_ingest_payload" function."""
@@ -141,7 +133,7 @@ def get_mocked_req():
   return mocked_req
 
 
-# copybara:insert(imports) class TestGoolePubSubMain(unittest.TestCase):
+class TestGoolePubSubMain(unittest.TestCase):
 @mock.patch(
     "{}.pubsub.main.pubsub_v1.SubscriberClient".format(INGESTION_SCRIPTS_PATH))
 class TestGoolePubSubMain(googletest.TestCase):

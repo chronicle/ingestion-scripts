@@ -14,12 +14,6 @@
 #
 """Fetch indicators from the STIX/TAXII Server and ingest into Chronicle."""
 
-# copybara:strip_begin(imports)
-from common import ingest
-from common import utils
-from stix_taxii import taxii_client
-# copybara:strip_end
-
 # Environment variable constants.
 ENV_TAXII_DISCOVERY_URL = "TAXII_DISCOVERY_URL"
 ENV_TAXII_USERNAME = "TAXII_USERNAME"

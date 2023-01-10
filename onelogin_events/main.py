@@ -16,13 +16,6 @@
 
 import datetime
 
-# copybara:strip_begin(imports)
-from common import auth
-from common import ingest
-from common import status
-from common import utils
-# copybara:strip_end
-
 # API URL for OneLogin Events.
 ONELOGIN_EVENTS_URL = "https://api.us.onelogin.com/api/1/events"
 

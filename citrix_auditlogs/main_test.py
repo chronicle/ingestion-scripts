@@ -18,22 +18,14 @@ import datetime
 import json
 import sys
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 
 import requests
 
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
-
 INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
 
 sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
-
-# copybara:strip_begin(imports)
-from citrix_auditlogs import main  # pylint: disable=g-import-not-at-top
-# copybara:strip_end
 
 
 def mock_get_env_var(*args, **kwargs):  # pylint: disable=unused-argument
@@ -86,7 +78,7 @@ _test_entities = [{
 }]
 
 
-# copybara:insert(imports) class TestAccessToken(unittest.TestCase):
+class TestAccessToken(unittest.TestCase):
 class TestAccessToken(googletest.TestCase):
   """Test cases to verfy "get_access_token" functionality."""
 
@@ -122,7 +114,7 @@ class TestAccessToken(googletest.TestCase):
     self.assertEqual(actual_access_token, expected_access_token)
 
 
-# copybara:insert(imports) class TestCitrixAuditLogs(unittest.TestCase):
+class TestCitrixAuditLogs(unittest.TestCase):
 @mock.patch(
     "{}.citrix_auditlogs.main.utils.get_env_var".format(INGESTION_SCRIPTS_PATH),
     side_effect=mock_get_env_var)

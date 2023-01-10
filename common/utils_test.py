@@ -15,24 +15,16 @@
 """Unit test file for utils.py file."""
 
 import datetime
-
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
-
-# copybara:strip_begin(imports)
 from common import utils
-# copybara:strip_end
 
 # Path to common framework.
 INGESTION_SCRIPTS_PATH = "common"
 
 
-# copybara:insert(imports) class TestUtilsFromCommon(unittest.TestCase):
-class TestUtilsFromCommon(googletest.TestCase):
+class TestUtilsFromCommon(unittest.TestCase):
   """Unit test class for utils."""
 
   def test_get_env_var_runtime_error(self):

@@ -21,11 +21,6 @@ from typing import Any, Dict, List, Union
 
 from google.cloud import pubsub_v1
 
-# copybara:strip_begin(imports)
-from common import env_constants
-from common import ingest
-# copybara:strip_end
-
 # Default initialization of variable.
 PAYLOAD_SIZE = None
 PAYLOAD = None

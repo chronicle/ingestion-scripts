@@ -14,27 +14,20 @@
 #
 """Unit test file for auth.py file."""
 
-# copybara:insert(imports) import unittest
+import unittest
 from unittest import mock
 
-# copybara:strip_begin(imports)
-from google3.testing.pybase import googletest
-# copybara:strip_end
-
-# copybara:strip_begin(imports)
 from common import auth
-# copybara:strip_end
 
 # Path to common framework.
-INGESTION_SCRIPTS_PATH = "common"
+INGESTION_SCRIPTS_PATH = "common."
 
 
-# copybara:insert(imports) class TestAuthMethod(unittest.TestCase):
-class TestAuthMethod(googletest.TestCase):
+class TestAuthMethod(unittest.TestCase):
   """Unit test class for AuthMethod."""
 
   @mock.patch("requests.Request")
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.AuthMethod._make_api_call")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.AuthMethod._make_api_call")
   def test_paginate_success(self, mock_make_api_call, unused_mock_request):
     """Test case to verify the success scenario for the paginate method.
 
@@ -141,11 +134,10 @@ class TestAuthMethod(googletest.TestCase):
     assert auth_method.refresh_auth_tokens.call_count == 1
 
 
-# copybara:insert(imports) class TestOAuthClientCredentialsAuth(unittest.TestCase):
-class TestOAuthClientCredentialsAuth(googletest.TestCase):
+class TestOAuthClientCredentialsAuth(unittest.TestCase):
   """Unit test class for OAuthClientCredentialsAuth."""
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.requests")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.requests")
   def test_init_success(self, mock_requests):
     """Test case to verify the successful initialization of the object.
 
@@ -178,7 +170,7 @@ class TestOAuthClientCredentialsAuth(googletest.TestCase):
     assert mock_session.send.call_count == 1
     assert mock_response.json.call_count == 1
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.requests")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.requests")
   def test_init_for_access_token(self, mock_requests):
     """Test case to verify the successful initialization of the object.
 
@@ -213,7 +205,7 @@ class TestOAuthClientCredentialsAuth(googletest.TestCase):
     assert mock_response.json.call_count == 1
     assert oauth_ob.session.headers["Authorization"] == "Bearer access_token"
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.requests")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.requests")
   def test_init_for_failure(self, mock_requests):
     """Test case to verify the execution of init when API returns 401 error.
 
@@ -243,11 +235,10 @@ class TestOAuthClientCredentialsAuth(googletest.TestCase):
     assert mock_response.json.call_count == 1
 
 
-# copybara:insert(imports) class TestOAuthPasswordGrantCredentialsAuth(unittest.TestCase):
-class TestOAuthPasswordGrantCredentialsAuth(googletest.TestCase):
+class TestOAuthPasswordGrantCredentialsAuth(unittest.TestCase):
   """Unit test class for TestOAuthPasswordGrantCredentialsAuth."""
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.requests")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.requests")
   def test_init_access_token(self, mock_requests):
     """Test case to verify the successful execution of init function.
 
@@ -273,7 +264,7 @@ class TestOAuthPasswordGrantCredentialsAuth(googletest.TestCase):
     assert mock_response.json.call_count == 1
     assert "Authorization" in oauth_ob.session.headers
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.requests")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.requests")
   def test_init_failure(self, mock_requests):
     """Test case to verify the execution of init when API returns 401 error.
 
@@ -294,12 +285,11 @@ class TestOAuthPasswordGrantCredentialsAuth(googletest.TestCase):
     assert mock_response.json.call_count == 1
 
 
-# copybara:insert(imports) class TestOAuthJWTCredentialsAuth(unittest.TestCase):
-class TestOAuthJWTCredentialsAuth(googletest.TestCase):
+class TestOAuthJWTCredentialsAuth(unittest.TestCase):
   """Unit test class for OAuthJWTCredentialsAuth."""
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.requests")
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.auth.jwt")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.requests")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}auth.jwt")
   def test_init_when_access_token_in_response(self, unused_mock_jwt,
                                               mock_requests):
     """Test case to verify the execution of init when access_token found in response.
