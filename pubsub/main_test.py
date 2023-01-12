@@ -20,14 +20,16 @@ import sys
 import unittest
 from unittest import mock
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
 
-sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+import main
 
 
-class TestGooglePubSubBuildPayload(unittest.TestCase):
-@mock.patch("{}.pubsub.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
-class TestGooglePubSubMain(googletest.TestCase):
+@mock.patch("{}main.ingest.ingest".format(SCRIPT_PATH))
+class TestGooglePubSubMain(unittest.TestCase):
   """Test cases to verify the functioning of "build_and_ingest_payload" function."""
   # Set variables values.
   main.PAYLOAD_SIZE = 0
@@ -133,14 +135,11 @@ def get_mocked_req():
   return mocked_req
 
 
+@mock.patch("{}main.pubsub_v1.SubscriberClient".format(SCRIPT_PATH))
 class TestGoolePubSubMain(unittest.TestCase):
-@mock.patch(
-    "{}.pubsub.main.pubsub_v1.SubscriberClient".format(INGESTION_SCRIPTS_PATH))
-class TestGoolePubSubMain(googletest.TestCase):
   """Test cases to verify the 'main' function for the script."""
 
-  @mock.patch(
-      "{}.pubsub.main.build_and_ingest_payload".format(INGESTION_SCRIPTS_PATH))
+  @mock.patch("{}main.build_and_ingest_payload".format(SCRIPT_PATH))
   def test_callback(self, mocked_build_and_ingest_payload,
                     mocked_subscriber_client):
     """Test case to verify we call the 'build_and_ingest_payload' when receiving the data from publisher.
@@ -158,8 +157,7 @@ class TestGoolePubSubMain(googletest.TestCase):
     })
 
   @mock.patch("builtins.print")
-  @mock.patch(
-      "{}.pubsub.main.build_and_ingest_payload".format(INGESTION_SCRIPTS_PATH))
+  @mock.patch("{}main.build_and_ingest_payload".format(SCRIPT_PATH))
   def test_callback_value_error(self, unused_mocked_build_and_ingest_payload,
                                 mocked_print, mocked_subscriber_client):
     """Test case to verify we raise an error with expected message on encountering ValueError from JSON loads.
@@ -183,8 +181,7 @@ class TestGoolePubSubMain(googletest.TestCase):
 
     self.assertEqual(actual_calls, expected_calls)
 
-  @mock.patch(
-      "{}.pubsub.main.build_and_ingest_payload".format(INGESTION_SCRIPTS_PATH))
+  @mock.patch("{}main.build_and_ingest_payload".format(SCRIPT_PATH))
   def test_future_timeout_error(self, unused_mocked_build_and_ingest_payload,
                                 mocked_subscriber_client):
     """Test case to verify we call 'cancel' and 'result' functions when we encounter 'TimeoutError'.
@@ -201,7 +198,7 @@ class TestGoolePubSubMain(googletest.TestCase):
     self.assertEqual(mock_future.result.call_count, 2)
     self.assertEqual(mock_future.cancel.call_count, 1)
 
-  @mock.patch("{}.pubsub.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
+  @mock.patch("{}main.ingest.ingest".format(SCRIPT_PATH))
   def test_ingest_remaining_payload_in_the_end(self, mocked_ingest,
                                                mocked_subscriber_client):
     """Test case to verify we ingest remaining PAYLOAD in the end."""
