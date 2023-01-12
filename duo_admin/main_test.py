@@ -20,8 +20,12 @@ import time
 import unittest
 from unittest import mock
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
-sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
+
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+import main
 
 
 def mock_get_env_var(*args, **unused_kwargs):
@@ -44,13 +48,12 @@ def mock_get_env_var(*args, **unused_kwargs):
     return "test"
 
 
-class TestDuoAdminIngestion(unittest.TestCase):
 @mock.patch(
-    f"{INGESTION_SCRIPTS_PATH}.duo_admin.main.utils.get_env_var",
+    f"{SCRIPT_PATH}main.utils.get_env_var",
     side_effect=mock_get_env_var)
-@mock.patch(f"{INGESTION_SCRIPTS_PATH}.duo_admin.main.ingest.ingest")
-@mock.patch(f"{INGESTION_SCRIPTS_PATH}.duo_admin.main.duo_client.Admin")
-class TestDuoAdminIngestion(googletest.TestCase):
+@mock.patch(f"{SCRIPT_PATH}main.ingest.ingest")
+@mock.patch(f"{SCRIPT_PATH}main.duo_client.Admin")
+class TestDuoAdminIngestion(unittest.TestCase):
   """Test cases to verify Duo Admin ingestion script."""
 
   def test_no_logs_to_ingest(self, mocked_duo_admin, mocked_ingest,
@@ -75,7 +78,7 @@ class TestDuoAdminIngestion(googletest.TestCase):
 
     self.assertEqual(mocked_ingest.call_count, 0)
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.duo_admin.main.utils.datetime")
+  @mock.patch(f"{SCRIPT_PATH}main.utils.datetime")
   def test_log_retrieve_time(self, mocked_script_datetime, mocked_duo_admin,
                              unused_mocked_ingest, unused_mocked_get_env_var):
     """Test case to verify the log retrieve time is as expected.
@@ -169,6 +172,3 @@ class TestDuoAdminIngestion(googletest.TestCase):
     expected_latest_timestamp = 999
 
     self.assertEqual(actual_latest_timestamp, expected_latest_timestamp)
-
-if __name__ == "__main__":
-  googletest.main()
