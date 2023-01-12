@@ -23,11 +23,14 @@ from unittest import mock
 from google.auth.transport import requests
 import requests as req
 
-INGESTION_SCRIPTS_PATH = 'google3.third_party.chronicle.ingestion_scripts'
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
 
 # Mock the chronicle library.
-sys.modules['{}.common.ingest'.format(
+sys.modules['{}common.ingest'.format(
     INGESTION_SCRIPTS_PATH)] = mock.MagicMock()
+
+import main
 
 
 def mock_get_env_var(*args, **kwargs):  # pylint: disable=unused-argument
@@ -38,15 +41,12 @@ def mock_get_env_var(*args, **kwargs):  # pylint: disable=unused-argument
     return 'test'
 
 
+@mock.patch(
+    '{}main.utils.get_env_var'.format(
+        SCRIPT_PATH), side_effect=mock_get_env_var)
+@mock.patch('{}main.auth.OAuthClientCredentialsAuth'.format(SCRIPT_PATH))
+@mock.patch('{}main.ingest.ingest'.format(SCRIPT_PATH))
 class TestGetEventsFromOneLogin(unittest.TestCase):
-@mock.patch(
-    '{}.onelogin_events.main.utils.get_env_var'.format(
-        INGESTION_SCRIPTS_PATH), side_effect=mock_get_env_var)
-@mock.patch('{}.onelogin_events.main.auth.OAuthClientCredentialsAuth'.format(
-    INGESTION_SCRIPTS_PATH))
-@mock.patch(
-    '{}.onelogin_events.main.ingest.ingest'.format(INGESTION_SCRIPTS_PATH))
-class TestGetEventsFromOneLogin(googletest.TestCase):
   """Unit test case class for OneLogin Events."""
 
   @mock.patch('builtins.print')
@@ -141,8 +141,8 @@ class TestGetEventsFromOneLogin(googletest.TestCase):
     self.assertEqual(actual_calls, expected_calls)
     self.assertEqual(mock_ingest.call_count, 2)
 
-  @mock.patch(f'{INGESTION_SCRIPTS_PATH}.onelogin_events.main.utils.datetime')
-  @mock.patch(f'{INGESTION_SCRIPTS_PATH}.onelogin_events.main.datetime')
+  @mock.patch(f'{SCRIPT_PATH}main.utils.datetime')
+  @mock.patch(f'{SCRIPT_PATH}main.datetime')
   def test_log_retrieve_time(self, mocked_utils_datetime
                              , mocked_script_datetime, unused_mock_ingest,
                              unused_mock_oauth, unused_mock_env_var):
@@ -172,8 +172,7 @@ class TestGetEventsFromOneLogin(googletest.TestCase):
     expected_url = f'https://api.us.onelogin.com/api/1/events?since={expected_start_date}&until={expected_end_date}'
     self.assertEqual(args[0], expected_url)
 
-  @mock.patch('{}.onelogin_events.main.get_and_ingest_events'.format(
-      INGESTION_SCRIPTS_PATH))
+  @mock.patch('{}main.get_and_ingest_events'.format(SCRIPT_PATH))
   def test_http_error(self, unused_mock_ingest, unused_mock_oauth,
                       unused_mock_env_var, mock_events):
     """Test that `main` function raises exception if API returns error."""
