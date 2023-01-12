@@ -23,9 +23,13 @@ from unittest import mock
 
 import requests
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
 
-sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+
+import main
 
 
 def mock_get_env_var(*args, **kwargs):  # pylint: disable=unused-argument
@@ -69,7 +73,6 @@ _test_entities = [{
 
 
 class TestAccessToken(unittest.TestCase):
-class TestAccessToken(googletest.TestCase):
   """Test cases to verfy "get_access_token" functionality."""
 
   @mock.patch("builtins.print")
@@ -104,17 +107,13 @@ class TestAccessToken(googletest.TestCase):
     self.assertEqual(actual_access_token, expected_access_token)
 
 
-class TestCitrixSessions(unittest.TestCase):
 @mock.patch(
-    "{}.citrix_sessions.main.utils.get_env_var".format(INGESTION_SCRIPTS_PATH),
+    "{}main.utils.get_env_var".format(SCRIPT_PATH),
     side_effect=mock_get_env_var)
-@mock.patch(
-    "{}.citrix_sessions.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
-@mock.patch(
-    "{}.citrix_sessions.main.create_new_session".format(INGESTION_SCRIPTS_PATH))
-@mock.patch(
-    "{}.citrix_sessions.main.requests.get".format(INGESTION_SCRIPTS_PATH))
-class TestCitrixSessions(googletest.TestCase):
+@mock.patch("{}main.ingest.ingest".format(SCRIPT_PATH))
+@mock.patch("{}main.create_new_session".format(SCRIPT_PATH))
+@mock.patch("{}main.requests.get".format(SCRIPT_PATH))
+class TestCitrixSessions(unittest.TestCase):
   """Test cases to verify Citrix Sessions script."""
 
   @mock.patch("builtins.print")
@@ -213,8 +212,8 @@ class TestCitrixSessions(googletest.TestCase):
         " metadata."
     )
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.citrix_sessions.main.utils.datetime")
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.citrix_sessions.main.datetime")
+  @mock.patch(f"{SCRIPT_PATH}main.utils.datetime")
+  @mock.patch(f"{SCRIPT_PATH}main.datetime")
   def test_log_retrieve_time(self, mocked_utils_datetime, mocked_script_datetime
                              , mocked_get, mocked_create_session
                              , unused_mocked_ingest, unused_mocked_get_env_var):

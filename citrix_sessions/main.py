@@ -18,9 +18,14 @@ import datetime
 
 import requests
 
+from common import auth
+from common import ingest
+from common import status
+from common import utils
+
 # Environment variables name.
 ENV_CITRIX_URL_DOMAIN = "URL_DOMAIN"
-ENV_CITRIX_CUSTOMER_ID = "CUSTOMER_ID"
+ENV_CITRIX_CUSTOMER_ID = "CITRIX_CUSTOMER_ID"
 ENV_CITRIX_CLIENT_ID = "CITRIX_CLIENT_ID"
 ENV_CITRIX_CLIENT_SECRET = "CITRIX_CLIENT_SECRET"
 
