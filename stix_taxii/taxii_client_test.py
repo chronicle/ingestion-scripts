@@ -22,8 +22,12 @@ from unittest import mock
 
 import requests_mock
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
-sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
+
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+import taxii_client
 
 # Headers constants.
 TAXII_V21_HEADERS = {"Content-Type": "application/taxii+json;version=2.1"}
@@ -57,7 +61,6 @@ TEST_PASSWORD = "test_password"
 
 
 class TestTaxiiClientVersion11(unittest.TestCase):
-class TestTaxiiClientVersion11(googletest.TestCase):
   """Test cases for TAXII Client version 1.1."""
 
   def setUp(self):
@@ -158,7 +161,6 @@ class TestTaxiiClientVersion11(googletest.TestCase):
 
 
 class TestTaxiiClientVersion20(unittest.TestCase):
-class TestTaxiiClientVersion20(googletest.TestCase):
   """Test cases for TAXII Client version 2.0."""
 
   def setUp(self):
@@ -243,7 +245,6 @@ class TestTaxiiClientVersion20(googletest.TestCase):
 
 
 class TestTaxiiClientVersion21(unittest.TestCase):
-class TestTaxiiClientVersion21(googletest.TestCase):
   """Test cases for TAXII Client version 2.1."""
 
   def setUp(self):

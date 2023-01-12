@@ -20,8 +20,13 @@ import sys
 import unittest
 from unittest import mock
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
-sys.modules[f"{INGESTION_SCRIPTS_PATH}.common.ingest"] = mock.Mock()
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
+
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+import main
+import taxii_client
 
 # Test value for poll interval.
 TEST_POLL_INTERVAL = 15
@@ -39,18 +44,17 @@ def get_mock_response() -> mock.Mock:
   return response
 
 
-class TestTaxiiClientVersion11(unittest.TestCase):
-class TestStixTaxiiIngestion(googletest.TestCase):
+class TestStixTaxiiIngestion(unittest.TestCase):
   """Test cases for the main function."""
 
   @mock.patch(
-      f"{INGESTION_SCRIPTS_PATH}.stix_taxii.main.taxii_client."
+      f"{SCRIPT_PATH}main.taxii_client."
       "convert_date_to_stix_format")
   @mock.patch(
-      f"{INGESTION_SCRIPTS_PATH}.stix_taxii.main.taxii_client.TAXIIClient")
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.stix_taxii.main.utils.get_env_var")
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.common.auth.requests.Session.send")
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.stix_taxii.main.ingest.ingest")
+      f"{SCRIPT_PATH}main.taxii_client.TAXIIClient")
+  @mock.patch(f"{SCRIPT_PATH}main.utils.get_env_var")
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}common.auth.requests.Session.send")
+  @mock.patch(f"{SCRIPT_PATH}main.ingest.ingest")
   def test_main_success(self, mocked_ingest, mocked_send, *unused_args):
     """Test case to verify that the ingest function should be called once when the TAXII Server returns valid response.
     """
