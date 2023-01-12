@@ -21,8 +21,12 @@ from unittest import mock
 
 import requests
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
-sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
+
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+import main
 
 
 def get_mock_response():
@@ -89,13 +93,10 @@ _test_key_to_remove_entity = {
 }
 
 
+@mock.patch("{}main.utils.get_env_var".format(SCRIPT_PATH), return_value="test")
+@mock.patch("{}main.ingest.ingest".format(SCRIPT_PATH))
+@mock.patch("{}main.requests.post".format(SCRIPT_PATH))
 class TestMISPIngestion(unittest.TestCase):
-@mock.patch(
-    "{}.misp.main.utils.get_env_var".format(INGESTION_SCRIPTS_PATH),
-    return_value="test")
-@mock.patch("{}.misp.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
-@mock.patch("{}.misp.main.requests.post".format(INGESTION_SCRIPTS_PATH))
-class TestMISPIngestion(googletest.TestCase):
   """Test cases to verify MISP ingestion script."""
 
   @mock.patch("builtins.print")
