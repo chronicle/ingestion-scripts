@@ -21,8 +21,12 @@ import unittest
 from unittest import mock
 import requests
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
-sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
+
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+import main
 
 
 def mock_get_env_var(*args, **unused_kwargs):
@@ -63,13 +67,12 @@ def get_mock_response():
   return response
 
 
-class TestSlackIngestion(unittest.TestCase):
 @mock.patch(
-    "{}.slack.main.utils.get_env_var".format(INGESTION_SCRIPTS_PATH),
+    "{}main.utils.get_env_var".format(SCRIPT_PATH),
     side_effect=mock_get_env_var)
-@mock.patch("{}.slack.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
-@mock.patch("{}.slack.main.requests.get".format(INGESTION_SCRIPTS_PATH))
-class TestSlackIngestion(googletest.TestCase):
+@mock.patch("{}main.ingest.ingest".format(SCRIPT_PATH))
+@mock.patch("{}main.requests.get".format(SCRIPT_PATH))
+class TestSlackIngestion(unittest.TestCase):
   """Test cases to verify Slack ingestion script."""
 
   @mock.patch("builtins.print")
@@ -119,7 +122,7 @@ class TestSlackIngestion(googletest.TestCase):
 
     self.assertEqual(mocked_ingest.call_count, 0)
 
-  @mock.patch("{}.slack.main.utils.datetime".format(INGESTION_SCRIPTS_PATH))
+  @mock.patch("{}main.utils.datetime".format(SCRIPT_PATH))
   def test_log_retrieve_time(self, mocked_utils_datetime,
                              mocked_get, unused_mocked_ingest,
                              unused_mocked_get_env_var):
