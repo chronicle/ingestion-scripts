@@ -23,9 +23,12 @@ from unittest import mock
 
 import requests
 
-INGESTION_SCRIPTS_PATH = "google3.third_party.chronicle.ingestion_scripts"
+INGESTION_SCRIPTS_PATH = ""
+SCRIPT_PATH = ""
 
-sys.modules["{}.common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+sys.modules["{}common.ingest".format(INGESTION_SCRIPTS_PATH)] = mock.Mock()
+
+import main
 
 
 def mock_get_env_var(*args, **kwargs):  # pylint: disable=unused-argument
@@ -79,7 +82,6 @@ _test_entities = [{
 
 
 class TestAccessToken(unittest.TestCase):
-class TestAccessToken(googletest.TestCase):
   """Test cases to verfy "get_access_token" functionality."""
 
   @mock.patch("builtins.print")
@@ -114,18 +116,17 @@ class TestAccessToken(googletest.TestCase):
     self.assertEqual(actual_access_token, expected_access_token)
 
 
-class TestCitrixAuditLogs(unittest.TestCase):
 @mock.patch(
-    "{}.citrix_auditlogs.main.utils.get_env_var".format(INGESTION_SCRIPTS_PATH),
+    "{}main.utils.get_env_var".format(SCRIPT_PATH),
     side_effect=mock_get_env_var)
 @mock.patch(
-    "{}.citrix_auditlogs.main.ingest.ingest".format(INGESTION_SCRIPTS_PATH))
+    "{}main.ingest.ingest".format(SCRIPT_PATH))
 @mock.patch(
-    "{}.citrix_auditlogs.main.create_new_session".format(INGESTION_SCRIPTS_PATH)
+    "{}main.create_new_session".format(SCRIPT_PATH)
 )
 @mock.patch(
-    "{}.citrix_auditlogs.main.requests.get".format(INGESTION_SCRIPTS_PATH))
-class TestCitrixAuditLogs(googletest.TestCase):
+    "{}main.requests.get".format(SCRIPT_PATH))
+class TestCitrixAuditLogs(unittest.TestCase):
   """Test cases to verify Citrix Audit Logs script."""
 
   @mock.patch("builtins.print")
@@ -228,10 +229,10 @@ class TestCitrixAuditLogs(googletest.TestCase):
     mocked_print.assert_called_with(
         "ERROR: Unexpected data format received while collecting audit logs.")
 
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.citrix_auditlogs.main.utils.datetime")
-  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.citrix_auditlogs.main.datetime")
+  @mock.patch(f"{SCRIPT_PATH}main.utils.datetime")
+  @mock.patch(f"{SCRIPT_PATH}main.datetime")
   @mock.patch(
-      f"{INGESTION_SCRIPTS_PATH}.citrix_auditlogs.main.get_access_token")
+      f"{SCRIPT_PATH}main.get_access_token")
   def test_log_retrieve_time(self, unused_mock_token, mocked_utils_datetime,
                              mocked_script_datetime, mocked_get,
                              mocked_create_session,
@@ -261,7 +262,7 @@ class TestCitrixAuditLogs(googletest.TestCase):
     self.assertEqual(kwargs.get("params"), expected_log_retrieve_params)
 
   @mock.patch(
-      "{}.citrix_auditlogs.main.get_access_token".format(INGESTION_SCRIPTS_PATH)
+      "{}main.get_access_token".format(SCRIPT_PATH)
   )
   def test_no_logs_to_ingest(self, unused_mock_token, mocked_get,
                              mocked_create_session, mocked_ingest,
@@ -278,7 +279,7 @@ class TestCitrixAuditLogs(googletest.TestCase):
     self.assertEqual(mocked_ingest.call_count, 0)
 
   @mock.patch(
-      "{}.citrix_auditlogs.main.get_access_token".format(INGESTION_SCRIPTS_PATH)
+      "{}main.get_access_token".format(SCRIPT_PATH)
   )
   def test_pagination(self, unused_mock_token, mocked_get, mocked_creds,
                       mocked_ingest, unused_mocked_get_env_var):
