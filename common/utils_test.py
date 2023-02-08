@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ from unittest import mock
 from common import utils
 
 # Path to common framework.
-INGESTION_SCRIPTS_PATH = "common"
+INGESTION_SCRIPTS_PATH = (
+    "common"
+)
 
 
 class TestUtilsFromCommon(unittest.TestCase):
@@ -104,3 +106,27 @@ class TestUtilsFromCommon(unittest.TestCase):
     mocked_datetime.timedelta.return_value = datetime.timedelta(seconds=600)
     self.assertEqual(utils.get_last_run_at(),
                      datetime.datetime(2022, 1, 1, 6, 20, 00))
+
+  @mock.patch("{}.utils.datetime".format(INGESTION_SCRIPTS_PATH))
+  @mock.patch(
+      "{}.utils.get_env_var".format(INGESTION_SCRIPTS_PATH), return_value=10)
+  def test_get_last_run_at_for_get_env_var(self, mocked_get_env_var,
+                                           mocked_datetime):
+    """Test case to verify that the get_last_run_at calls the get_env_var with valid arguments.
+
+    Args:
+      mocked_get_env_var (int): Mocked return value of get_env_var()
+      mocked_datetime (mock.Mock): Mocked object of datetime module.
+
+    Asserts:
+      get_last_run_at() method returns a datetime object based on POLL_INTERVAL
+      environment variable.
+      get_env_var() method is called with valid parameters.
+    """
+    mocked_datetime.datetime.now.return_value = datetime.datetime(
+        2022, 1, 1, 6, 30, 00)
+    mocked_datetime.timedelta.return_value = datetime.timedelta(seconds=600)
+    self.assertEqual(utils.get_last_run_at(),
+                     datetime.datetime(2022, 1, 1, 6, 20, 00))
+    self.assertEqual(mocked_get_env_var.mock_calls[0],
+                     mock.call("POLL_INTERVAL", required=False, default=5))

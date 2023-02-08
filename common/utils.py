@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
 """Utility functions required for ingestion scripts."""
 
 import datetime
+import json
 import os
-from typing import Any
+from typing import Dict, Any
 
 from google.cloud import secretmanager
 
@@ -35,8 +36,8 @@ def get_env_var(
     name (str): Name of the environment variable.
     required (Optional[bool]): Script will exit with RuntimeError if this is
       True and variable is not set. Defaults to True.
-    default (Optional[Any]): Default value to return in case the env variable
-      is not set. Defaults to None.
+    default (Optional[Any]): Default value to return in case the env variable is
+      not set. Defaults to None.
     is_secret (bool): Script will get data from Google Cloud Secret Manager in
       case it is set to true.
 
@@ -50,7 +51,8 @@ def get_env_var(
     raise RuntimeError(f"Environment variable {name} is required.")
   if is_secret:
     return get_value_from_secret_manager(os.environ[name])
-  if name not in os.environ:
+  if name not in os.environ or (name in os.environ and
+                                not os.environ[name].strip()):
     return default
   return os.environ[name]
 
@@ -70,14 +72,14 @@ def get_last_run_at() -> datetime.datetime:
   try:
     # If the POLL_INTERVAL is not passed, the default value will considered as
     # last 5 minutes from the current time.
-    poll_interval = get_env_var(env_constants.ENV_POLL_INTERVAL, required=False,
-                                default=5)
+    poll_interval = get_env_var(
+        env_constants.ENV_POLL_INTERVAL, required=False, default=5)
 
     if int(poll_interval) <= 0:
       raise ValueError
 
-    return datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(
-        minutes=int(poll_interval))
+    return datetime.datetime.now(
+        datetime.timezone.utc) - datetime.timedelta(minutes=int(poll_interval))
   except ValueError as error:
     raise RuntimeError(
         "Invalid value provided for the POLL_INTERVAL environment variable. A "
@@ -88,9 +90,9 @@ def get_value_from_secret_manager(resource_path: str) -> str:
   """Retrieve the value of the secret from the Google Cloud Secret Manager.
 
   Args:
-    resource_path (str): Path of the secret with version included.
-      Ex.: "projects/<project_id>/secrets/<secret_name>/versions/1",
-           "projects/<project_id>/secrets/<secret_name>/versions/latest"
+    resource_path (str): Path of the secret with version included. Ex.:
+      "projects/<project_id>/secrets/<secret_name>/versions/1",
+      "projects/<project_id>/secrets/<secret_name>/versions/latest"
 
   Returns:
     str: Payload for secret.
@@ -101,3 +103,28 @@ def get_value_from_secret_manager(resource_path: str) -> str:
   # Access the secret version.
   response = client.access_secret_version(name=resource_path)
   return response.payload.data.decode("UTF-8")
+
+
+def load_service_account(service_account: str,
+                         product_name: str) -> Dict[str, Any]:
+  """Load a service account string to the dictionary.
+
+  Args:
+      service_account (str): Service account string.
+      product_name (str): The name of the product whose service_account string
+        is serialized.
+
+  Returns:
+      service_account_dict (Dict): Parsed service account dictionary from
+      given string.
+
+  Raises:
+      RuntimeError: If the provided service account string is not JSON
+      serializable.
+  """
+  try:
+    return json.loads(service_account)
+  except json.JSONDecodeError as error:
+    print("Could not load the service account string.")
+    raise RuntimeError(
+        f"Invalid Service Account JSON provided for {product_name}.") from error

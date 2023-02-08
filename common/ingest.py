@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,10 +41,12 @@ INGESTION_API_BASE_URL = "malachiteingestion-pa.googleapis.com"
 # have kept 0.5MB as a buffer.
 SIZE_THRESHOLD_BYTES = 950000
 
-try:
-  SERVICE_ACCOUNT_DICT = json.loads(SERVICE_ACCOUNT)
-except json.JSONDecodeError as error:
-  raise RuntimeError("Invalid Service Account JSON provided.") from error
+# Count of logs to check the batch size at once.
+# We will check the payload size for 100 entries at once and
+# ingest it into Chronicle if it exceeds more than 0.95MB.
+LOG_BATCH_SIZE = 100
+
+SERVICE_ACCOUNT_DICT = utils.load_service_account(SERVICE_ACCOUNT, "Chronicle")
 
 
 def initialize_http_session(
@@ -81,6 +83,12 @@ def ingest(data: list[Any], log_type: str):
   index = 0
   namespace = os.getenv(env_constants.ENV_CHRONICLE_NAMESPACE)
 
+  # Parse the data in a format expected by Ingestion API of Chronicle.
+  # The Ingestion API of Chronicle expects log payload in the format of
+  # [{"logText": str(log1)}, {"logText": str(log2)}, ...]
+  parsed_data = list(
+      map(lambda i: {"logText": str(json.dumps(i).encode("utf-8"), "utf-8")},
+          data))
   # JSON payload to be sent to Chronicle.
   body = {
       "customerId": CUSTOMER_ID,
@@ -91,24 +99,45 @@ def ingest(data: list[Any], log_type: str):
     body["namespace"] = namespace
 
   # Loop over the list of events to send to Chronicle.
-  while index < len(data):
+  while index < len(parsed_data):
     # Chronicle Ingestion API can receive a maximum of 1 MB of data in a
     # single execution. To be on a safer side, a chunk of size 0.95MB is
     # created, keeping 0.5MB as a buffer.
-    if sys.getsizeof(json.dumps(data[index])) + sys.getsizeof(
-        json.dumps(body)) <= SIZE_THRESHOLD_BYTES:
-      temp_result = json.dumps(data[index]).encode("utf-8")
-      temp_result = str(temp_result, "utf-8")
-      body["entries"].append({"logText": temp_result})
-      index += 1
-    # A chunk of size 0.95MB is prepared. Hence sending data to Chronicle.
-    else:
-      _send_logs_to_chronicle(
-          http_session,
-          body,
-          REGION,
-      )
-      body["entries"].clear()
+
+    # If size of 100 logs is greater than 0.95MB, we will loop over each log
+    # separately. Else we will add 100 logs at a time and check if size is
+    # less than 0.95MB or not.
+    next_batch_of_logs = parsed_data[index:index + LOG_BATCH_SIZE]
+    size_of_current_payload = sys.getsizeof(json.dumps(body))
+    size_of_next_batch = sys.getsizeof(json.dumps(next_batch_of_logs))
+
+    # The size of next 100 logs to add is greater than 0.95MB.
+    if size_of_next_batch >= SIZE_THRESHOLD_BYTES:
+      print("Size of next 100 logs to ingest is greater than 0.95MB. Hence,"
+            " looping over each log separately.")
+      # Looping over each log separately.
+      size_of_next_log = sys.getsizeof(json.dumps(parsed_data[index]))
+      if size_of_current_payload + size_of_next_log <= SIZE_THRESHOLD_BYTES:
+        body["entries"].append(parsed_data[index])
+        index += 1
+        continue
+
+    # Adding the next 100 logs in the payload if the size of the payload is not
+    # exceeding 0.95MB.
+    elif size_of_current_payload + size_of_next_batch <= SIZE_THRESHOLD_BYTES:
+      print("Adding a batch of 100 logs to the Ingestion API payload.")
+      body["entries"].extend(next_batch_of_logs)
+      index += LOG_BATCH_SIZE
+      continue
+
+    # A batch of logs is prepared for ingestion into the Chronicle.
+    _send_logs_to_chronicle(
+        http_session,
+        body,
+        REGION,
+    )
+    body["entries"].clear()
+
   # If the data received to ingest is below 0.95MB, the above while loop is
   # yet to send the data to Chronicle. Hence, sending the data now.
   if body["entries"]:
