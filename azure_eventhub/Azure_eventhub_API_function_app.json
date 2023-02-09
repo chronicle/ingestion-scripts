@@ -1,0 +1,60 @@
+{
+  "id": "Azure EventHub integration with Google Chronicle",
+  "title": "Azure EventHub integration with Google Chronicle",
+  "descriptionMarkdown": "The azure function triggers when a new event is encountered in azure event hub and ingests them into Chronicle.",
+  "additionalRequirementBanner": "The azure function requires Credentials of Chronicle platform to ingest data into the Chronicle.",
+  "graphQueries": [
+  ],
+  "sampleQueries": [
+  ],
+  "dataTypes": [
+  ],
+  "connectivityCriterias": [
+  ],
+  "availability": {
+      "status": 1,
+      "isPreview": true
+  },
+  "permissions": {
+      "resourceProvider": [
+          {
+              "provider": "Microsoft.OperationalInsights/workspaces",
+              "permissionsDisplayText": "read and write permissions on the workspace are required.",
+              "providerDisplayName": "Workspace",
+              "scope": "Workspace",
+              "requiredPermissions": {
+                  "write": true,
+                  "read": true,
+                  "delete": true
+              }
+          },
+          {
+              "provider": "Microsoft.OperationalInsights/workspaces/sharedKeys",
+              "permissionsDisplayText": "read permissions to shared keys for the workspace are required. [See the documentation to learn more about workspace keys](https://docs.microsoft.com/azure/azure-monitor/platform/agent-windows#obtain-workspace-id-and-key).",
+              "providerDisplayName": "Keys",
+              "scope": "Workspace",
+              "requiredPermissions": {
+                  "action": true
+              }
+          }
+      ],
+      "customs": [{
+          "name": "Microsoft.Web/sites permissions",
+          "description": "Read and write permissions to Azure Functions to create a Function App is required. [See the documentation to learn more about Azure Functions](https://docs.microsoft.com/azure/azure-functions/)."
+      },
+      {
+          "name": "Chronicle API Credentials/permissions",
+          "description": "**Chronicle Customer ID**, **Chronicle Region**, **Chronicle Service Account** and **Chronicle Data Type** is required. See the documentation to learn more about API on the `https://cloud.google.com/chronicle/docs/reference/ingestion-api`"
+      }
+      ]
+  },
+  "instructionSteps": [{
+          "title": "",
+          "description": ">**NOTE:** This connector uses Azure Functions to connect to the Chronicle Ingestion API and pushes events from Azure Event Hub. This might result in additional data ingestion costs. Check the [Azure Functions pricing page](https://azure.microsoft.com/pricing/details/functions/) for details."
+      },
+      {
+          "title": "Deploy Azure Function using following deployment steps by Azure Resource Manager (ARM) Template",
+          "description": "Use this method for automated deployment of the Azure Ingestion Script.\n\n1. Click the **Deploy to Azure** button below. \n\n\t[![Deploy To Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchronicle%2Fingestion-scripts%2Fblob%2Fmain%2Fazure_eventhub%2Fazuredeploy_Connector_EventHub_AzureFunctions.json)\n2. Select the preferred **Subscription**, **Resource Group** and **Location**. \n3. Enter the below information : \n\t\tFunction Name \n\t\tEvent Hub Name \n\t\tEvent Hub Namespace \n\t\tShared Access Key \n\t\tChronicle Customer ID \n\t\tChronicle Service Account JSON \n\t\tChronicle Region \n\t\tChronicle Data Type \n4. Click **Review + Create ** button. \n5. Click **Create** to deploy."
+      }
+  ]
+}

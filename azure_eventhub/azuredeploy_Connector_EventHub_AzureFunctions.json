@@ -1,0 +1,257 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "FunctionName": {
+          "type": "string",
+          "defaultValue": "LogScaleO365",
+          "minLength": 1,
+          "maxLength": 11,
+          "metadata": {
+              "description": "App names only allow alphanumeric characters and hyphens, cannot start or end in a hyphen, and must be greater than 3 and less than 24 characters"
+          }
+      },
+      "EventhubNamespace":{
+          "type": "string",
+          "metadata": {
+              "description": "EventHub Namespace"
+            },
+          "defaultValue": "<EventhubNamespace>"
+      },
+      "EventhubName": {
+          "type": "string",
+          "metadata": {
+              "description": "EventHub Name"
+            },
+          "defaultValue": "<EventhubName>"
+      },
+      "SharedAccessKey": {
+          "type": "string",
+          "metadata": {
+              "description": "Specify the primary key of EventHub Namespace"
+            },
+          "defaultValue": "<SharedAccessKey>"
+      },
+      "ChronicleCustomerID": {
+          "type": "string",
+          "metadata": {
+              "description": "Specify Customer ID of the Chronicle"
+            },
+          "defaultValue": "<ChronicleCustomerID>"
+      },
+      "ChronicleServiceAccount":{
+          "type": "string",
+          "metadata": {
+              "description": "Specify Chronicle Service Account"
+            },
+          "defaultValue": "<ChronicleServiceAccount>"
+      },
+      "ChronicleRegion":{
+          "type": "string",
+          "metadata": {
+              "description": "Specify Chronicle Region"
+          },
+          "defaultValue": "us"
+      },
+      "ChronicleDateType":{
+          "type": "string",
+          "metadata": {
+              "description": "Specify Log Type to ingest data into Chronicle"
+          },
+          "defaultValue": "<ChronicleDateType>"
+      }
+
+  },
+  "variables": {
+      "FunctionName": "[concat(toLower(parameters('FunctionName')), uniqueString(resourceGroup().id))]",
+      "StorageSuffix": "[environment().suffixes.storage]",
+    "Eventhubconnstr": "[concat('Endpoint=sb://',parameters('EventhubNamespace'),'.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=',parameters('SharedAccessKey'))]"
+  },
+  "resources": [
+      {
+          "type": "Microsoft.Insights/components",
+          "apiVersion": "2015-05-01",
+          "name": "[variables('FunctionName')]",
+          "location": "[resourceGroup().location]",
+          "kind": "web",
+          "properties": {
+              "Application_Type": "web",
+              "ApplicationId": "[variables('FunctionName')]"
+          }
+      },
+      {
+          "type": "Microsoft.Storage/storageAccounts",
+          "apiVersion": "2019-06-01",
+          "name": "[tolower(variables('FunctionName'))]",
+          "location": "[resourceGroup().location]",
+          "sku": {
+              "name": "Standard_LRS",
+              "tier": "Standard"
+          },
+          "kind": "StorageV2",
+          "properties": {
+              "networkAcls": {
+                  "bypass": "AzureServices",
+                  "virtualNetworkRules": [],
+                  "ipRules": [],
+                  "defaultAction": "Allow"
+              },
+              "supportsHttpsTrafficOnly": true,
+              "encryption": {
+                  "services": {
+                      "file": {
+                          "keyType": "Account",
+                          "enabled": true
+                      },
+                      "blob": {
+                          "keyType": "Account",
+                          "enabled": true
+                      }
+                  },
+                  "keySource": "Microsoft.Storage"
+              }
+          }
+      },
+      {
+          "type": "Microsoft.Storage/storageAccounts/blobServices",
+          "apiVersion": "2019-06-01",
+          "name": "[concat(variables('FunctionName'), '/default')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts', tolower(variables('FunctionName')))]"
+          ],
+          "sku": {
+              "name": "Standard_LRS",
+              "tier": "Standard"
+          },
+          "properties": {
+              "cors": {
+                  "corsRules": []
+              },
+              "deleteRetentionPolicy": {
+                  "enabled": false
+              }
+          }
+      },
+      {
+          "type": "Microsoft.Storage/storageAccounts/fileServices",
+          "apiVersion": "2019-06-01",
+          "name": "[concat(variables('FunctionName'), '/default')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts', tolower(variables('FunctionName')))]"
+          ],
+          "sku": {
+              "name": "Standard_LRS",
+              "tier": "Standard"
+          },
+          "properties": {
+              "cors": {
+                  "corsRules": []
+              }
+          }
+      },
+      {
+          "type": "Microsoft.Web/sites",
+          "apiVersion": "2022-03-01",
+          "name": "[variables('FunctionName')]",
+          "location": "[resourceGroup().location]",
+
+          "kind": "functionapp,linux",
+          "identity": {
+              "type": "SystemAssigned"
+          },
+          "properties": {
+              "name": "[variables('FunctionName')]",
+              "reserved": true,
+              "isXenon": false,
+              "hyperV": false,
+              "vnetRouteAllEnabled": false,
+              "vnetImagePullEnabled": false,
+              "vnetContentShareEnabled": false,
+              "siteConfig": {
+                  "numberOfWorkers": 1,
+                  "linuxFxVersion": "PYTHON|3.9",
+                  "acrUseManagedIdentityCreds": false,
+                  "alwaysOn": false,
+                  "http20Enabled": false,
+                  "functionAppScaleLimit": 200,
+                  "minimumElasticInstanceCount": 0
+              },
+              "hostNameSslStates": [
+                  {
+                      "name": "[concat(parameters('FunctionName'), '.azurewebsites.net')]",
+                      "sslState": "Disabled",
+                      "hostType": "Standard"
+                  },
+                  {
+                      "name": "[concat(parameters('FunctionName'), '.scm.azurewebsites.net')]",
+                      "sslState": "Disabled",
+                      "hostType": "Repository"
+                  }
+              ]
+
+          },
+          "resources": [
+              {
+                  "apiVersion": "2018-11-01",
+                  "type": "config",
+                  "name": "appsettings",
+                  "dependsOn": [
+                      "[concat('Microsoft.Web/sites/', variables('FunctionName'))]"
+                  ],
+                  "properties": {
+                      "FUNCTIONS_EXTENSION_VERSION": "~4",
+                      "FUNCTIONS_WORKER_RUNTIME": "python",
+                      "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.insights/components', variables('FunctionName')), '2015-05-01').InstrumentationKey]",
+                      "APPLICATIONINSIGHTS_CONNECTION_STRING": "[reference(resourceId('microsoft.insights/components', variables('FunctionName')), '2015-05-01').ConnectionString]",
+                      "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', toLower(variables('FunctionName')),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', toLower(variables('FunctionName'))), '2019-06-01').keys[0].value, ';EndpointSuffix=',toLower(variables('StorageSuffix')))]",
+                      "EventhubName": "[parameters('EventhubName')]",
+                      "CHRONICLE_CUSTOMER_ID": "[parameters('ChronicleCustomerID')]",
+                      "CHRONICLE_SERVICE_ACCOUNT": "[parameters('ChronicleServiceAccount')]",
+                      "CHRONICLE_REGION": "[parameters('ChronicleRegion')]",
+                      "CHRONICLE_DATA_TYPE": "[parameters('ChronicleDateType')]",
+                      "EventhubNamespace": "[parameters('EventhubNamespace')]",
+                      "SharedAccessKey": "[parameters('SharedAccessKey')]",
+                      "EVENT_HUB_CONNECTION_STRING": "[variables('Eventhubconnstr')]",
+                      "WEBSITE_RUN_FROM_PACKAGE": "https://github.com/chronicle/ingestion-scripts/blob/main/azure_eventhub/AzureEventhub.zip?raw=true"
+                  }
+              }
+          ]
+      },
+      {
+          "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+          "apiVersion": "2019-06-01",
+          "name": "[concat(variables('FunctionName'), '/default/azure-webjobs-hosts')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('FunctionName'), 'default')]",
+              "[resourceId('Microsoft.Storage/storageAccounts', variables('FunctionName'))]"
+          ],
+          "properties": {
+              "publicAccess": "None"
+          }
+      },
+      {
+          "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+          "apiVersion": "2019-06-01",
+          "name": "[concat(variables('FunctionName'), '/default/azure-webjobs-secrets')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('FunctionName'), 'default')]",
+              "[resourceId('Microsoft.Storage/storageAccounts', variables('FunctionName'))]"
+          ],
+          "properties": {
+              "publicAccess": "None"
+          }
+      },
+      {
+          "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+          "apiVersion": "2019-06-01",
+          "name": "[concat(variables('FunctionName'), '/default/', tolower(variables('FunctionName')))]",
+          "dependsOn": [
+              "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('FunctionName'), 'default')]",
+              "[resourceId('Microsoft.Storage/storageAccounts', variables('FunctionName'))]"
+          ],
+          "properties": {
+              "shareQuota": 5120
+          }
+      }
+  ]
+}
