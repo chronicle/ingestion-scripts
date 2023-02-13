@@ -31,10 +31,7 @@ TREND_MICRO_AUDIT_LOGS_DATA_TYPE = "audit_logs"
 TREND_MICRO_ALERTS_DATA_TYPE = "alerts"
 
 # Log type to push data into Chronicle.
-CHRONICLE_DATA_TYPE = {
-    TREND_MICRO_AUDIT_LOGS_DATA_TYPE: "TREND_MICRO_VISION_AUDIT",
-    TREND_MICRO_ALERTS_DATA_TYPE: "TREND_MICRO_VISION_ALERT"
-}
+CHRONICLE_DATA_TYPE = "TRENDMICRO_VISION_ONE"
 
 # By default, the script will collect data of audit logs and alerts.
 DEFAULT_TREND_MICRO_DATA_TYPE = (
@@ -106,7 +103,7 @@ def get_and_ingest_vision_one_logs(
     if data_list:
       log_count += len(data_list)
       try:
-        ingest.ingest(data_list, CHRONICLE_DATA_TYPE.get(data_type))
+        ingest.ingest(data_list, CHRONICLE_DATA_TYPE)
       except Exception as error:
         raise RuntimeError(
             f"Unable to push Trend Micro Vision One {data_type} into Chronicle:"
