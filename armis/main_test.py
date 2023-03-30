@@ -36,6 +36,17 @@ MOCK_RESPONSE_ACCESS_TOKEN = {
     }
 }
 
+INITIAL_ACCESS_TOKEN_INFO = {
+    "access_token": "",
+    "expiration_utc": "",
+}
+
+ARMIS_SECRET_KEY = "armis_secret_key"
+
+ARMIS_SERVER_URL = "armis_server_url"
+
+CHRONICLE_LABELS = ["ARMIS_ALERTS", "ARMIS_VULNERABILITIES"]
+
 MOCK_RESPONSE_ALERTS = [
     {
         "alertId": 1,
@@ -163,9 +174,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case to verify that we do not call ingest function when there are no logs to ingest."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_ALERTS,ARMIS_VULNERABILITIES",
-        "armis_url",
-        "armis_secret_key",
         "http://http_proxy_url",
         "http://http_proxy_url",
         None,
@@ -195,11 +203,17 @@ class TestArmisLogsIngestion(unittest.TestCase):
     mocked_datetime.datetime.strptime.side_effect = datetime.datetime.strptime
     os.environ["HTTPS_PROXY"] = "http://http_proxy_url"
 
-    main.main(request="")
+    for chronicle_label in CHRONICLE_LABELS:
+      main.execute_script(
+          ARMIS_SERVER_URL,
+          ARMIS_SECRET_KEY,
+          chronicle_label,
+          INITIAL_ACCESS_TOKEN_INFO,
+      )
 
     self.assertEqual(mocked_ingest.call_count, 0)
     self.assertEqual(
-        mocked_get_env_var.mock_calls[3],
+        mocked_get_env_var.mock_calls[0],
         mock.call("HTTPS_PROXY", required=False),
     )
 
@@ -236,10 +250,12 @@ class TestArmisLogsIngestion(unittest.TestCase):
     )
     self.assertEqual(os.environ["HTTPS_PROXY"], "http://http_proxy_url")
 
+  @mock.patch("builtins.print")
   @mock.patch(f"{INGESTION_SCRIPTS_PATH}main.armis_client.datetime")
   def test_pagination_for_logs(
       self,
       mocked_datetime,
+      mocked_print,
       unused_mock_multiprocessing,
       mock_http_request,
       unused_mocked_sleep,
@@ -249,9 +265,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case to verify the pagination mechanism for logs."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_ALERTS",
-        "armis_url",
-        "armis_secret_key",
         None,
         None,
         None,
@@ -302,7 +315,12 @@ class TestArmisLogsIngestion(unittest.TestCase):
         mocked_response_4,
     ]
 
-    main.main(request="")
+    main.execute_script(
+        ARMIS_SERVER_URL,
+        ARMIS_SECRET_KEY,
+        "ARMIS_ALERTS",
+        INITIAL_ACCESS_TOKEN_INFO,
+    )
 
     self.assertEqual(mocked_ingest.call_count, 2)
     self.assertEqual(
@@ -312,6 +330,11 @@ class TestArmisLogsIngestion(unittest.TestCase):
             mock.call([MOCK_RESPONSE_ALERTS[1]], "ARMIS_ALERTS"),
         ],
     )
+    mocked_print.assert_has_calls([
+        mock.call(
+            "A total of 3 alerts were successfully ingested into Chronicle."
+        ),
+    ])
 
   @mock.patch(f"{INGESTION_SCRIPTS_PATH}main.armis_client.datetime")
   def test_pagination_in_vulnerabilities(
@@ -326,9 +349,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case to verify the pagination mechanism in vulnerabilities data type."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_VULNERABILITIES",
-        "armis_url",
-        "armis_secret_key",
         None,
         None,
         None,
@@ -377,7 +397,12 @@ class TestArmisLogsIngestion(unittest.TestCase):
         mocked_response_4,
     ]
 
-    main.main(request="")
+    main.execute_script(
+        ARMIS_SERVER_URL,
+        ARMIS_SECRET_KEY,
+        "ARMIS_VULNERABILITIES",
+        INITIAL_ACCESS_TOKEN_INFO,
+    )
 
     self.assertEqual(mocked_ingest.call_count, 2)
     self.assertEqual(
@@ -404,9 +429,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case scenario when error is obtained from Chronicle ingestion."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_ALERTS,ARMIS_VULNERABILITIES",
-        "armis_url",
-        "armis_secret_key",
         "http_proxy_url",
         "http_proxy_url",
         None,
@@ -431,8 +453,14 @@ class TestArmisLogsIngestion(unittest.TestCase):
         "Bad Request. Request contains an invalid argument."
     )
 
-    with self.assertRaises(Exception) as error:
-      main.main(request="")
+    for chronicle_label in CHRONICLE_LABELS:
+      with self.assertRaises(Exception) as error:
+        main.execute_script(
+            ARMIS_SERVER_URL,
+            ARMIS_SECRET_KEY,
+            chronicle_label,
+            INITIAL_ACCESS_TOKEN_INFO,
+        )
 
     self.assertEqual(
         str(error.exception),
@@ -455,9 +483,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case scenario when 400 error is obtained from Armis API."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_ALERTS,ARMIS_VULNERABILITIES",
-        "armis_url",
-        "armis_secret_key",
         None,
         None,
         None,
@@ -469,10 +494,16 @@ class TestArmisLogsIngestion(unittest.TestCase):
         reason="Bad Request",
     )
 
-    mock_http_request.side_effect = [mocked_response]
+    mock_http_request.side_effect = [mocked_response, mocked_response]
 
-    with self.assertRaises(Exception) as error:
-      main.main(request="")
+    for chronicle_label in CHRONICLE_LABELS:
+      with self.assertRaises(Exception) as error:
+        main.execute_script(
+            ARMIS_SERVER_URL,
+            ARMIS_SECRET_KEY,
+            chronicle_label,
+            INITIAL_ACCESS_TOKEN_INFO,
+        )
 
     self.assertEqual(
         str(error.exception),
@@ -493,9 +524,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case scenario when 500 error is obtained from Armis API."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_ALERTS",
-        "armis_url",
-        "armis_secret_key",
         None,
         None,
         None,
@@ -515,7 +543,12 @@ class TestArmisLogsIngestion(unittest.TestCase):
     ]
 
     with self.assertRaises(Exception) as error:
-      main.main(request="")
+      main.execute_script(
+          ARMIS_SERVER_URL,
+          ARMIS_SECRET_KEY,
+          "ARMIS_ALERTS",
+          INITIAL_ACCESS_TOKEN_INFO,
+      )
 
     self.assertEqual(
         str(error.exception),
@@ -537,11 +570,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case scenario when 401 error is obtained from Armis API."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_ALERTS",
-        "armis_url",
-        "armis_secret_key",
-        None,
-        None,
         None,
         None,
     ]
@@ -562,7 +590,12 @@ class TestArmisLogsIngestion(unittest.TestCase):
     ]
 
     with self.assertRaises(Exception) as error:
-      main.main(request="")
+      main.execute_script(
+          ARMIS_SERVER_URL,
+          ARMIS_SECRET_KEY,
+          "ARMIS_ALERTS",
+          INITIAL_ACCESS_TOKEN_INFO,
+      )
 
     self.assertEqual(
         str(error.exception),
@@ -583,9 +616,6 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case scenario when connection error is obtained from Armis API."""
     mocked_get_env_var.side_effect = [
-        "ARMIS_ALERTS,ARMIS_VULNERABILITIES",
-        "armis_url",
-        "armis_secret_key",
         None,
         None,
         None,
@@ -595,8 +625,14 @@ class TestArmisLogsIngestion(unittest.TestCase):
         "Failed to establish a connection."
     )
 
-    with self.assertRaises(Exception) as error:
-      main.main(request="")
+    for chronicle_lable in CHRONICLE_LABELS:
+      with self.assertRaises(Exception) as error:
+        main.execute_script(
+            ARMIS_SERVER_URL,
+            ARMIS_SECRET_KEY,
+            chronicle_lable,
+            INITIAL_ACCESS_TOKEN_INFO,
+        )
 
     self.assertEqual(
         str(error.exception),
@@ -640,7 +676,7 @@ class TestArmisLogsIngestion(unittest.TestCase):
   ):
     """Test case scenario when invalid chronicle label is provided in environment variable."""
 
-    mocked_get_env_var.side_effect = ["ARMIS_ALERTS,INVALID_LABEL"]
+    mocked_get_env_var.side_effect = ["ARMIS_ALERTS, INVALID_LABEL"]
 
     with self.assertRaises(Exception) as error:
       main.main(request="")

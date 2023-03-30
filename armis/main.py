@@ -177,6 +177,7 @@ def get_and_ingest_logs(
     total_logs += len(logs)
     if total_logs > logs_need_to_fetch:
       logs_need_to_remove = total_logs - logs_need_to_fetch
+      total_logs -= logs_need_to_remove
       logs = logs[0 : (len(logs) - logs_need_to_remove)]
 
     print(
