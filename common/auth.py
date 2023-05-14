@@ -71,7 +71,7 @@ class AuthMethod:
 
     Raises:
       ValueError: If "has_next" or "before_next" is not found in kwargs.
-      HTTPError: If any error occures during API calls.
+      HTTPError: If any error occurs during API calls.
     """
 
     if HAS_NEXT not in kwargs:

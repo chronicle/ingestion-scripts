@@ -163,7 +163,7 @@ def _send_logs_to_chronicle(
     region (str): Region of Ingestion API.
 
   Raises:
-    RuntimeError: Raises if any error occured during log ingestion.
+    RuntimeError: Raises if any error occurred during log ingestion.
   """
   if region.lower() != "us":
     url = ("https://" + region.lower() + "-" + INGESTION_API_BASE_URL +

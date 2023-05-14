@@ -111,7 +111,7 @@ def exit_function(*unused_args, **unused_kwargs):
 
 
 def mocked_result(*unused_args, **kwargs):
-  """Raise TimeoutError when calling 'result' with (timoeut=5)."""
+  """Raise TimeoutError when calling 'result' with (timeout=5)."""
   if kwargs.get("timeout"):
     raise main.futures.TimeoutError()
 

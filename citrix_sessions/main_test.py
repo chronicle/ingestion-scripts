@@ -73,7 +73,7 @@ _test_entities = [{
 
 
 class TestAccessToken(unittest.TestCase):
-  """Test cases to verfy "get_access_token" functionality."""
+  """Test cases to verify "get_access_token" functionality."""
 
   @mock.patch("builtins.print")
   def test_get_access_token_index_error(self, mocked_print):

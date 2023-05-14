@@ -109,7 +109,7 @@ def get_and_ingest_events(api_key: str,
 
   except Exception as error:
     print(
-        "ERROR: Unexpected error occured while fetching events from the MISP"
+        "ERROR: Unexpected error occurred while fetching events from the MISP"
         " API."
     )
     raise error
