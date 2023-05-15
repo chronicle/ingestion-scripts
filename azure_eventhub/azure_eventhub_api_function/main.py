@@ -46,15 +46,28 @@ def main(events: List[func.EventHubEvent]) -> None:
       raise RuntimeError(
           "The log data from Azure EventHub is not JSON serializable."
       ) from error
-    events_to_send.append(records)
+
+    # If events are nested in the list form in Eventhub log message.
+    # Example: {"records": [event1, event2, event3, ...]}
+    if isinstance(records, list):
+      events_to_send.extend(records)
+    else:
+      events_to_send.append(records)
+
+  events_count = len(events_to_send)
+  logging.info(
+      "Parsed %s events from Azure EventHub. Sending events to Chronicle.",
+      events_count
+  )
 
   try:
     # Ingest Azure EventHub logs to Chronicle.
     ingest.ingest(events_to_send, chronicle_data_type)
   except Exception as error:
-    raise Exception("Unable to push the data to the Chronicle.") from error
+    raise Exception(f"Unable to push the data to the Chronicle. Error: {error}"  # pylint: disable=broad-exception-raised
+                    )  from error
 
   logging.info(
       "Total %s log(s) are successfully ingested to Chronicle.",
-      len(events_to_send),
+      events_count,
   )

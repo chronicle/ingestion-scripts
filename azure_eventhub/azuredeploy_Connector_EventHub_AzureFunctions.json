@@ -4,11 +4,11 @@
   "parameters": {
       "FunctionName": {
           "type": "string",
-          "defaultValue": "LogScaleO365",
+          "defaultValue": "Chronicle",
           "minLength": 1,
           "maxLength": 11,
           "metadata": {
-              "description": "App names only allow alphanumeric characters and hyphens, cannot start or end in a hyphen, and must be greater than 3 and less than 24 characters"
+              "description": "Function names only allow alphanumeric characters. Special characters are not allowed and the length should be less than or equal to 11 characters."
           }
       },
       "EventhubNamespace":{

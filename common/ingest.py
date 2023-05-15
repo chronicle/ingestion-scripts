@@ -50,7 +50,7 @@ SERVICE_ACCOUNT_DICT = utils.load_service_account(SERVICE_ACCOUNT, "Chronicle")
 
 
 def initialize_http_session(
-    service_account_json: dict[Any, Any],
+    service_account_json: Dict[Any, Any],
     scopes: Optional[Sequence[str]] = None,
 ) -> Requests.AuthorizedSession:
   """Initializes an authenticated session with Google Chronicle.

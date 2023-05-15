@@ -54,14 +54,47 @@ class TestEventHubToChronicleIngestion(unittest.TestCase):
 
     self.assertEqual(
         str(error.exception),
-        "The log data from Azure EventHub is not JSON serializable.")
+        "The log data from Azure EventHub is not JSON serializable.",
+    )
+
+  @mock.patch(f"{SCRIPT_PATH}main.utils")
+  @mock.patch(f"{SCRIPT_PATH}main.ingest.ingest")
+  def test_list_data_parsing(self, mock_ingest, mock_utils):
+    """Test case to verify json loads for failure."""
+    mock_utils.get_env_var.side_effect = ENV_VARS
+    events = [mock.MagicMock()]
+    events[0].get_body.return_value = b'{"records": ["e1", "e2", "e3"]}'
+    main.main(events)
+    args, kwargs = mock_ingest.call_args  # pylint: disable=unused-variable
+
+    events_expected = ["e1", "e2", "e3"]
+    assert mock_ingest.call_count == 1
+    self.assertEqual(
+        args[0], events_expected
+    )
+
+  @mock.patch(f"{SCRIPT_PATH}main.utils")
+  @mock.patch(f"{SCRIPT_PATH}main.ingest.ingest")
+  def test_str_data_parsing(self, mock_ingest, mock_utils):
+    """Test case to verify json loads for failure."""
+    mock_utils.get_env_var.side_effect = ENV_VARS
+    events = [mock.MagicMock()]
+    events[0].get_body.return_value = b'{"records": "e1"}'
+    main.main(events)
+    args, kwargs = mock_ingest.call_args  # pylint: disable=unused-variable
+
+    events_expected = ["e1"]
+    assert mock_ingest.call_count == 1
+    self.assertEqual(
+        args[0], events_expected
+    )
 
   @mock.patch(f"{SCRIPT_PATH}main.utils")
   @mock.patch(f"{SCRIPT_PATH}main.ingest")
   def test_ingest_for_error(self, mock_ingest, mock_utils):
     """Test case to verify error is raised for failure in ingest."""
     mock_utils.get_env_var.side_effect = ENV_VARS
-    mock_ingest.ingest.side_effect = Exception()
+    mock_ingest.ingest.side_effect = Exception("Custom error for testing")
     events = [mock.MagicMock()]
     events[0].get_body.return_value = b'{"records": []}'
 
@@ -69,4 +102,7 @@ class TestEventHubToChronicleIngestion(unittest.TestCase):
       main.main(events)
 
     self.assertEqual(
-        str(error.exception), "Unable to push the data to the Chronicle.")
+        str(error.exception),
+        "Unable to push the data to the Chronicle. Error: Custom error for"
+        " testing",
+    )
