@@ -128,3 +128,13 @@ def load_service_account(service_account: str,
     print("Could not load the service account string.")
     raise RuntimeError(
         f"Invalid Service Account JSON provided for {product_name}.") from error
+
+
+def cloud_logging(message: str, severity: str = "INFO") -> None:
+  """Function for logging in google cloud function.
+
+  Args:
+    message (str): The message to log
+    severity (str): severity of the message. Defaults to "INFO".
+  """
+  print(json.dumps({"severity": severity, "message": message}))

@@ -235,3 +235,42 @@ class TestIngestMethod(unittest.TestCase):
     assert mocked_http_session.request.call_count == 1
     assert mocked_response.json.call_count == 1
     assert mocked_response.raise_for_status.call_count == 1
+
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.ingest.initialize_http_session")
+  def test_get_reference_list_success(self, mocked_initialize_http_session):
+    mock_session = mock.MagicMock()
+    mock_session.request.return_value = mock.Mock(
+        status_code=200, json=lambda: {"lines": ["item1", "item2", "item3"]}
+    )
+    mocked_initialize_http_session.return_value = mock_session
+    response = ingest.get_reference_list("test")
+    assert response == ["item1", "item2", "item3"]
+
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.ingest.initialize_http_session")
+  def test_get_reference_list_success_us_location(
+      self, mocked_initialize_http_session
+  ):
+    original_value = ingest.REGION
+    ingest.REGION = "us"
+    mock_session = mock.MagicMock()
+    mock_session.request.return_value = mock.Mock(
+        status_code=200, json=lambda: {"lines": ["item1", "item2", "item3"]}
+    )
+    mocked_initialize_http_session.return_value = mock_session
+    response = ingest.get_reference_list("test")
+    assert (
+        mock_session.request.call_args_list[0][0][1]
+        == "https://backstory.googleapis.com/v2/lists/test"
+    )
+    assert response == ["item1", "item2", "item3"]
+    ingest.REGION = original_value
+
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.ingest.initialize_http_session")
+  def test_get_reference_list_http_error(self, mock_initialize_http_session):
+    # Mocking an HTTP error response
+    mock_session = mock.MagicMock()
+    mock_session.request.return_value = mock.Mock(status_code=404)
+    mock_initialize_http_session.return_value = mock_session
+
+    with self.assertRaises(Exception):
+      ingest.get_reference_list("test")
