@@ -38,7 +38,7 @@ The Chronicle App for DomainTools fetches real-time events from the Chronicle an
 | DNSDB_API_KEY | Copied resource name value of DNSDB API key secret from the secret manager. | No | - | Yes |
 | FETCH_SUBDOMAINS_FOR_MAX_DOMAINS | Fetch subdomains for the maximum number of domains. | No | 2000 | No |
 | LOG_FETCH_DURATION | Time duration in the seconds to fetch events from the Chronicle. Provide an integer value. Eg. If the user wants to fetch the logs every 5 minutes then the user needs to specify 300 seconds. | Yes | - | No |
-|CHECKPOINT_FILE_PATH | Path of the checkpoint file if provided in the bucket. If provided, events from the specified will be fetched from the chronicle. If the file is present directly into the bucket then the user only needs to give the file name for this variable. If the file is given inside a folder then the path of the folder along with the file name needs to be specified like folderName/fileName. | No | - | No |
+|CHECKPOINT_FILE_PATH | Path of the checkpoint file if provided in the bucket. If provided, events from the specified will be fetched from the chronicle. Provide the checkpoint time in this format {"time": "YYYY-MM-DD hh:mm:ss"}. If the file is present directly into the bucket then the user only needs to give the file name for this variable. If the file is given inside a folder then the path of the folder along with the file name needs to be specified like folderName/fileName. | No | - | No |
 | FETCH_URL_EVENTS | Flag to fetch URL-aware events from the Chronicle. Accepted values [true, false] | No | false | No |
 | LOG_TYPE_FILE_PATH | Path of Log type file name if provided in the bucket. If provided, events from those log types will be fetched from the Chronicle. Otherwise, all log types will be considered. Provide comma-separated values in the file. If the file is present directly into the bucket then the user only needs to give the file name for this variable. If the file is given inside a folder then the path of the folder along with the file name needs to be specified like folderName/fileName. | No | All log types | No |
 | PROVISIONAL_TTL | TTL(time to leave) value if the domain has Evidence key and value as the provisional in the API response. Provide an integer value for this. If provided that will be considered, otherwise default 1 day will be considered. | No | 1 day | No |
@@ -164,7 +164,7 @@ CHRONICLE_SERVICE_ACCOUNT: projects/{project_id}/secrets/{secret_id}/versions/{v
 
 2. Click on the “Search” option in the sidebar panel.
 
-   ![Chronicle UI](images\chronicle.png)
+   ![Chronicle UI](images/chronicle.png)
 
 3. Click on the “Lists” option. The List Manager section will open.
 
@@ -172,7 +172,7 @@ CHRONICLE_SERVICE_ACCOUNT: projects/{project_id}/secrets/{secret_id}/versions/{v
 
 5. Specify the list name (TITLE), description and content (ROWS). Specify the content with one item on each line.
    
-   ![Reference List](images\reference_list.png)
+   ![Reference List](images/reference_list.png)
 
 6. The user has to create reference lists for allow list, monitoring list, monitoring tags and bulk enrichment ad-hoc script execution. The name of each list must be specified within the environment variable corresponding to its list type.
 
@@ -189,19 +189,19 @@ CHRONICLE_SERVICE_ACCOUNT: projects/{project_id}/secrets/{secret_id}/versions/{v
 
    - high_risk_domain_observed
 
-     ![High Risk Rule](images\high_risk_rule.png)
+     ![High Risk Rule](images/high_risk_rule.png)
    - medium_risk_domain_observed
 
-     ![Medium Risk Rule](images\medium_risk_rule.png)
+     ![Medium Risk Rule](images/medium_risk_rule.png)
    - young_domain
 
-     ![Young Domain Rule](images\young_domain_rule.png)
+     ![Young Domain Rule](images/young_domain_rule.png)
    - monitoring_list_domain 
 
-     ![Monitoring List Rule](images\monitoring_list_rule.png)
+     ![Monitoring List Rule](images/monitoring_list_rule.png)
    - monitoring_tags_domain_observed
 
-     ![Monitoring Tag Rule](images\monitoring_tags_rule.png)
+     ![Monitoring Tag Rule](images/monitoring_tags_rule.png)
 
 
 ### Ad-hoc script execution
@@ -245,7 +245,7 @@ CHRONICLE_SERVICE_ACCOUNT: projects/{project_id}/secrets/{secret_id}/versions/{v
    * The enriched domain event for the bulk enrichment domains will be ingested in the Chronicle.
    * When the user updates the list, a user needs to execute the ad-hoc script again.
 
-![Adhoc Parameters](images\adhoc_parameters.png)
+![Adhoc Parameters](images/adhoc_parameters.png)
 
 ## Resources
 
