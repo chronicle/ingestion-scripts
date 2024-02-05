@@ -49,7 +49,7 @@ class TestUtilsFromCommon(unittest.TestCase):
     self.assertEqual(utils.get_env_var("poll_interval"), "10")
 
   def test_get_env_var_default_value(self):
-    """Test case to verify that the defualt value is returned for the variable which does not exist in the environment variables.
+    """Test case to verify that the default value is returned for the variable which does not exist in the environment variables.
 
     Asserts:
       get_env_var() returns the default value set for the optional environment

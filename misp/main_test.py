@@ -121,7 +121,7 @@ class TestMISPIngestion(unittest.TestCase):
             "HTTP Error: 400, Reason: {'message': 'Bad request', 'url': '/events/restSearch'}"
         ),
         mock.call(
-            "ERROR: Unexpected error occured while fetching events from the MISP API."
+            "ERROR: Unexpected error occurred while fetching events from the MISP API."
         )
     ]
     self.assertEqual(mocked_print.mock_calls[-2:], expected_calls)
@@ -141,7 +141,7 @@ class TestMISPIngestion(unittest.TestCase):
 
   def test_ingest_logs(self, mocked_post, mocked_ingest,
                        unused_mocked_get_env_var):
-    """Test case to verify we call ingest with expcted args when we have logs to consume.
+    """Test case to verify we call ingest with expected args when we have logs to consume.
     """
     response = get_mock_response()
     response.json.return_value = {

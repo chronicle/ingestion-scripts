@@ -92,7 +92,7 @@ def get_and_ingest_audit_logs(central_info: Dict[str, Any]) -> None:
 
   # Iterate through all the pages until logs are available and ingest data into
   # Chronicle.
-  # Raise HTTPEror if response contains error code other than 200.
+  # Raise HTTPError if response contains error code other than 200.
   while remaining_records:
     # Fetch audit trails from the Aruba Central platform.
     response = audit.get_traillogs(

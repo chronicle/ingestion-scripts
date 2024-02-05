@@ -295,7 +295,7 @@ class TAXIIClient:
         temp_file.write(block.content)
         temp_file.seek(0)
         stix_package = core.STIXPackage.from_xml(temp_file)
-        stix_dict = stix_package.to_dict()  # Convert stix package to dictonary.
+        stix_dict = stix_package.to_dict()  # Convert stix package to dictionary.
         indicators = indicators + stix_dict.get("indicators", [])
         temp_file.close()  # This will delete the temporary file.
 
