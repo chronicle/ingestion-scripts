@@ -1,4 +1,4 @@
-# Chronicle 3p Ingestion Scripts
+# Google Security Operations 3p Ingestion Scripts
 
 ## Deploying the Cloud Function
 
@@ -18,7 +18,7 @@ README.md file.
 
 #### Common runtime environment variables
 
-Following is the table listing all the Chronicle related runtime environment
+Following is the table listing all the Google Security Operations related runtime environment
 variables that must be configured for all the ingestion scripts.
 
 | Variable                  | Description    | Required | Default | Secret |
@@ -51,7 +51,7 @@ as the value for environment variables. For example:
 
 #### Configuring the namespace
 
-The namespace that the Chronicle logs are ingested into can be configured by
+The namespace that the Google Security Operations logs are ingested into can be configured by
 setting the `CHRONICLE_NAMESPACE` environment variable.
 
 ### Deploying the cloud function
