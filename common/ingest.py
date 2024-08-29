@@ -94,7 +94,7 @@ def ingest(data: list[Any], log_type: str):
   # [{"logText": str(log1)}, {"logText": str(log2)}, ...]
   parsed_data = list(
       map(
-          lambda i: {"logText": str(json.dumps(i, separators=(',', ':')).encode("utf-8"), "utf-8")},
+          lambda i: {"logText": str(json.dumps(utils.cleanup(i), separators=(',', ':')).encode("utf-8"), "utf-8")},
           data,
       )
   )
