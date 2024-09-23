@@ -138,3 +138,20 @@ def cloud_logging(message: str, severity: str = "INFO") -> None:
     severity (str): severity of the message. Defaults to "INFO".
   """
   print(json.dumps({"severity": severity, "message": message}))
+
+
+def cleanup(object: dict | list) -> dict | list:
+    """Remove empty lists and dicts from an object
+    
+    Args:
+        object (dict | list): The object to cleanup
+
+    Returns:
+        dict | list: The cleaned object
+    """
+    if isinstance(object, dict):
+        return {k: cleanup(v) for k, v in object.items() if v and cleanup(v)}
+    elif isinstance(object, list):
+        return [cleanup(v) for v in object if v and cleanup(v)]
+    else:
+        return object
