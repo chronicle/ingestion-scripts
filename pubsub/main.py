@@ -51,11 +51,9 @@ def build_and_ingest_payload(log: Union[Dict[Any, Any], List[Any]]) -> str:
   if PAYLOAD_SIZE == 0:
     # Build a new object.
     PAYLOAD = []
-    log = json.dumps(log)
     PAYLOAD.append(log)
     PAYLOAD_SIZE = PAYLOAD_SIZE + (sys.getsizeof(json.dumps(PAYLOAD)))
   else:
-    log = json.dumps(log)
     logsize = sys.getsizeof(log)
     # Send when the payload hits a certain size.
     if PAYLOAD_SIZE + logsize > PAYLOAD_THRESHOLD:
