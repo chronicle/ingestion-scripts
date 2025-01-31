@@ -1,0 +1,4 @@
+functions-framework~=3.8.2
+google-auth~=2.38.0
+google-cloud-secret-manager~=2.22.1
+./deps/psengine-2.0.0-py3-none-any.whl

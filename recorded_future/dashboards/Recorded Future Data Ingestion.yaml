@@ -1,0 +1,828 @@
+lookml:
+- dashboard: recorded_future_data_ingestion
+  description: ""
+  elements:
+  - col: 0
+    column_limit: 50
+    defaults_version: 1
+    dynamic_fields:
+    - _kind_hint: measure
+      _type_hint: number
+      based_on: ingestion_metrics.quota_limit_per_second
+      category: measure
+      expression: ""
+      label: Max of Quota Limit per Second
+      measure: ingestion_metrics.max_of_quota_limit_mb_per_second
+      type: max
+    - _kind_hint: measure
+      _type_hint: number
+      based_on: ingestion_metrics.log_volume
+      expression: ""
+      label: Sum of Log Volume
+      measure: sum_of_log_volume
+      type: sum
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.timestamp_hour
+    - ingestion_metrics.total_log_volume_mb_per_hour
+    - ingestion_metrics.max_quota_limit_mb_per_second
+    fill_fields:
+    - ingestion_metrics.timestamp_hour
+    filters:
+      ingestion_metrics.component: Ingestion API
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+    height: 7
+    hidden_pivots: {}
+    interpolation: linear
+    label_density: 25
+    label_value_format: '[>=1000000000000000]#,##0.0,,,,," PB";[>=1000000000000]#,##0.0,,,,"
+      TB";#,##0.0,,," GB"'
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen: {}
+    model: scn
+    name: Burst Limit Graph
+    plot_size_by_field: false
+    point_style: none
+    row: 16
+    series_colors:
+      max_of_quota_limit_per_day: '#EA4335'
+    series_labels:
+      ingestion_metrics.max_quota_limit_mb_per_second: Burst Limit
+      ingestion_metrics.total_log_volume_mb_per_hour: Ingestion Rate
+      max_of_quota_limit_per_day: Quota Limit per Day
+      sum_of_log_volume: Daily Log Volume
+    show_null_points: true
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ingestion_metrics.timestamp_hour desc
+    stacking: ""
+    title: Burst Limit Graph
+    trellis: ""
+    type: looker_line
+    width: 12
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    x_axis_zoom: true
+    y_axes:
+    - label: Ingestion Rate (MBPS)
+      minValue: null
+      orientation: left
+      series:
+      - axisId: ingestion_metrics.total_log_volume_mb_per_hour
+        id: ingestion_metrics.total_log_volume_mb_per_hour
+        name: Total Log Volume Mb per Second
+      - axisId: ingestion_metrics.max_quota_limit_mb_per_second
+        id: ingestion_metrics.max_quota_limit_mb_per_second
+        name: Max of Quota Limit per Second
+      showLabels: true
+      showValues: true
+      tickDensity: default
+      tickDensityCustom: 5
+      type: log
+      unpinAxis: false
+      valueFormat: ""
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+    y_axis_zoom: true
+  - col: 12
+    column_limit: 50
+    defaults_version: 1
+    dynamic_fields:
+    - _kind_hint: measure
+      _type_hint: number
+      based_on: ingestion_metrics.quota_rejected_short_term_log_volume
+      category: measure
+      expression: ""
+      label: Max of Quota Rejected Log Volume
+      measure: max_of_quota_rejected_log_volume
+      type: sum
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.timestamp_hour
+    - max_of_quota_rejected_log_volume
+    fill_fields:
+    - ingestion_metrics.timestamp_hour
+    filters:
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+    height: 7
+    hidden_pivots: {}
+    hidden_series: []
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen: {}
+    model: scn
+    name: Burst Rejection Graph
+    plot_size_by_field: false
+    point_style: none
+    row: 16
+    series_colors:
+      max_of_quota_rejected_long_term_log_volume: '#E8710A'
+      max_of_quota_rejected_short_term_log_volume: '#F9AB00'
+    series_labels:
+      max_of_quota_rejected_long_term_log_volume: Quota Rejected Long Term Log Volume
+      max_of_quota_rejected_short_term_log_volume: Quota Rejected Short Term Log Volume
+    show_null_points: true
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ingestion_metrics.timestamp_hour desc
+    stacking: ""
+    title: Burst Rejection Graph
+    trellis: ""
+    type: looker_line
+    width: 12
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    x_axis_zoom: true
+    y_axes:
+    - label: Quota Rejection Volume
+      orientation: left
+      series:
+      - axisId: max_of_quota_rejected_log_volume
+        id: max_of_quota_rejected_log_volume
+        name: Max of Quota Rejected Log Volume
+      showLabels: true
+      showValues: true
+      tickDensity: default
+      tickDensityCustom: 5
+      type: linear
+      unpinAxis: false
+      valueFormat: '[>=1000000000000000]#,##0.0,,,,," PB";[>=1000000000000]#,##0.0,,,,"
+        TB";#,##0.0,,," GB"'
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+    y_axis_zoom: true
+  - col: 12
+    column_limit: 50
+    conditional_formatting:
+    - background_color: '#1A73E8'
+      bold: false
+      color_application:
+        collection_id: 7c56cc21-66e4-41c9-81ce-a60e1c3967b2
+        palette_id: 56d0c358-10a0-4fd6-aa0b-b117bef527ab
+      fields: null
+      font_color: null
+      italic: false
+      strikethrough: false
+      type: along a scale...
+      value: null
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.log_type
+    - ingestion_metrics.timestamp_date
+    - ingestion_metrics.total_entry_number
+    filters:
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+      ingestion_metrics.timestamp_time: 1 weeks
+    header_font_size: "12"
+    header_text_alignment: left
+    height: 6
+    hide_row_totals: false
+    hide_totals: false
+    limit: 100
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen: {}
+    minimum_column_width: 75
+    model: scn
+    name: Daily Log Information
+    row: 25
+    rows_font_size: "12"
+    show_row_numbers: false
+    show_row_totals: true
+    show_sql_query_menu_options: false
+    show_totals: true
+    show_view_names: false
+    size_to_fit: true
+    sorts:
+    - ingestion_metrics.timestamp_date desc
+    table_theme: unstyled
+    title: Daily Log Information
+    transpose: false
+    truncate_header: false
+    truncate_text: true
+    type: looker_grid
+    width: 12
+  - col: 7
+    column_limit: 50
+    comparison_reverse_colors: false
+    comparison_type: change
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    custom_color_enabled: true
+    defaults_version: 1
+    dynamic_fields:
+    - _kind_hint: measure
+      _type_hint: number
+      expression: ${ingestion_metrics.total_entry_number} - offset(${ingestion_metrics.total_entry_number},
+        1)
+      label: Delta
+      table_calculation: delta
+      value_format: '#,##0," K";-#,##0," K"'
+      value_format_name: null
+    enable_conditional_formatting: false
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.total_entry_number
+    - ingestion_metrics.period
+    filters:
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+    height: 3
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time: ingestion_metrics.timestamp_date
+    model: scn
+    name: Total Ingest Count
+    note_display: hover
+    note_state: collapsed
+    note_text: Delta compared to previous time period
+    plot_size_by_field: false
+    point_style: none
+    row: 0
+    show_comparison: true
+    show_comparison_label: false
+    show_null_points: true
+    show_single_value_title: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ingestion_metrics.period desc
+    stacking: ""
+    title: Total Ingest Count
+    trellis: ""
+    type: single_value
+    value_format: '[>=1000000000]#,##0,,," B";[>=1000000]0,," M";0," K"'
+    width: 5
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 19
+    column_limit: 50
+    comparison_reverse_colors: false
+    comparison_type: change
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    custom_color_enabled: true
+    defaults_version: 1
+    dynamic_fields:
+    - _kind_hint: measure
+      _type_hint: number
+      expression: ${ingestion_metrics.total_error_events} - offset(${ingestion_metrics.total_error_events},
+        1)
+      label: Delta
+      table_calculation: delta
+      value_format: '#,##0.0," K";-#,##0.0," K"'
+      value_format_name: null
+    enable_conditional_formatting: false
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.total_error_events
+    - ingestion_metrics.period
+    filters:
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+    height: 3
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time: ingestion_metrics.timestamp_date
+    model: scn
+    name: Total Error Count
+    note_display: hover
+    note_state: collapsed
+    note_text: Delta compared to previous time period
+    plot_size_by_field: false
+    point_style: none
+    row: 0
+    show_comparison: true
+    show_comparison_label: false
+    show_null_points: true
+    show_single_value_title: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ingestion_metrics.period desc
+    stacking: ""
+    title: Total Error Count
+    trellis: ""
+    type: single_value
+    value_format: '[>=1000000000]#,##0,,," B";[>=1000000]0,," M";0," K"'
+    width: 5
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - body_text: ""
+    col: 2
+    height: 3
+    name: Ingested Events Count
+    row: 0
+    title_text: Ingested Events Count
+    type: text
+    width: 5
+  - body_text: ""
+    col: 14
+    height: 3
+    name: Ingestion Error Count
+    row: 0
+    title_text: Ingestion Error Count
+    type: text
+    width: 5
+  - col: 0
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.log_type
+    - ingestion_metrics.timestamp_time
+    filters:
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+    header_font_size: "12"
+    header_text_alignment: left
+    height: 6
+    hide_row_totals: false
+    hide_totals: false
+    label_density: 25
+    legend_position: center
+    limit: 100
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen: {}
+    model: scn
+    name: Recently Ingested Events
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 25
+    rows_font_size: "12"
+    series_labels:
+      ingestion_metrics.log_type: Log Type
+      ingestion_metrics.timestamp_time: Timestamp
+    show_null_labels: false
+    show_row_numbers: false
+    show_row_totals: true
+    show_silhouette: false
+    show_sql_query_menu_options: false
+    show_totals: true
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - ingestion_metrics.timestamp_time desc
+    stacking: ""
+    table_theme: unstyled
+    title: Recently Ingested Events
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_column_names: false
+    truncate_text: true
+    type: looker_grid
+    width: 12
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 0
+    column_limit: 50
+    defaults_version: 1
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.total_events
+    - ingestion_metrics.total_normalized_events
+    - ingestion_metrics.total_error_events
+    - ingestion_metrics.total_parsing_error_events
+    - ingestion_metrics.total_validation_error_events
+    - ingestion_metrics.timestamp_date
+    fill_fields:
+    - ingestion_metrics.timestamp_date
+    filters:
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+    height: 7
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen: {}
+    model: scn
+    name: Recorded Future Ingestion - Events by Status
+    plot_size_by_field: false
+    point_style: none
+    row: 9
+    show_null_points: true
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ingestion_metrics.timestamp_date desc
+    stacking: ""
+    title: Recorded Future Ingestion - Events by Status
+    trellis: ""
+    type: looker_line
+    width: 24
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 0
+    color_application:
+      collection_id: 7c56cc21-66e4-41c9-81ce-a60e1c3967b2
+      options:
+        steps: 5
+      palette_id: 5d189dfc-4f46-46f3-822b-bfb0b61777b1
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ingestion_metrics_connector
+    fields:
+    - ingestion_metrics.log_type
+    - ingestion_metrics.total_size_bytes
+    - ingestion_metrics.timestamp_hour
+    fill_fields:
+    - ingestion_metrics.timestamp_hour
+    filters:
+      ingestion_metrics.log_type: '"RECORDED_FUTURE_IOC"'
+      ingestion_metrics.timestamp_hour: 24 hours
+    header_font_size: "12"
+    header_text_alignment: left
+    height: 7
+    hide_row_totals: false
+    hide_totals: false
+    interpolation: linear
+    label_density: 25
+    legend_position: right
+    limit: 500
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "20"
+      show_hide: show
+    listen: {}
+    model: scn
+    name: Ingestion - Throughput Hourly
+    pivots:
+    - ingestion_metrics.log_type
+    plot_size_by_field: false
+    point_style: none
+    row: 31
+    rows_font_size: "12"
+    series_cell_visualizations:
+      ingestion_metrics.total_events:
+        is_active: true
+    series_colors: {}
+    series_labels:
+      ingestion_metrics.log_type: Data Type
+      ingestion_metrics.total_error_events: Errors
+      ingestion_metrics.total_events: Ingested Events
+      ingestion_metrics.total_normalized_events: Normalized Events
+      ingestion_metrics.total_parsing_error_events: Parsing Errors
+      ingestion_metrics.total_size_bytes: Ingested Throughput
+      ingestion_metrics.total_validation_error_events: Validation Errors
+    show_null_points: true
+    show_row_numbers: false
+    show_row_totals: true
+    show_silhouette: false
+    show_sql_query_menu_options: false
+    show_totals: true
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - ingestion_metrics.log_type
+    - ingestion_metrics.timestamp_hour desc
+    stacking: percent
+    table_theme: unstyled
+    title: Ingestion - Throughput Hourly
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_text: true
+    type: looker_area
+    width: 24
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axes:
+    - label: Throughput %
+      orientation: left
+      series:
+      - axisId: ASSET_STATIC_IP - ingestion_metrics.total_size_bytes
+        id: ASSET_STATIC_IP - ingestion_metrics.total_size_bytes
+        name: ASSET_STATIC_IP
+      - axisId: CORELIGHT - ingestion_metrics.total_size_bytes
+        id: CORELIGHT - ingestion_metrics.total_size_bytes
+        name: CORELIGHT
+      - axisId: ELASTIC_PACKETBEATS - ingestion_metrics.total_size_bytes
+        id: ELASTIC_PACKETBEATS - ingestion_metrics.total_size_bytes
+        name: ELASTIC_PACKETBEATS
+      - axisId: ELASTIC_WINLOGBEAT - ingestion_metrics.total_size_bytes
+        id: ELASTIC_WINLOGBEAT - ingestion_metrics.total_size_bytes
+        name: ELASTIC_WINLOGBEAT
+      - axisId: FORWARDER_HEARTBEAT - ingestion_metrics.total_size_bytes
+        id: FORWARDER_HEARTBEAT - ingestion_metrics.total_size_bytes
+        name: FORWARDER_HEARTBEAT
+      - axisId: GCP - ingestion_metrics.total_size_bytes
+        id: GCP - ingestion_metrics.total_size_bytes
+        name: GCP
+      - axisId: GCP_CLOUD_NAT - ingestion_metrics.total_size_bytes
+        id: GCP_CLOUD_NAT - ingestion_metrics.total_size_bytes
+        name: GCP_CLOUD_NAT
+      - axisId: GCP_CSCC - ingestion_metrics.total_size_bytes
+        id: GCP_CSCC - ingestion_metrics.total_size_bytes
+        name: GCP_CSCC
+      - axisId: GCP_DNS - ingestion_metrics.total_size_bytes
+        id: GCP_DNS - ingestion_metrics.total_size_bytes
+        name: GCP_DNS
+      - axisId: GCP_FIREWALL - ingestion_metrics.total_size_bytes
+        id: GCP_FIREWALL - ingestion_metrics.total_size_bytes
+        name: GCP_FIREWALL
+      - axisId: GCP_VPC_FLOW - ingestion_metrics.total_size_bytes
+        id: GCP_VPC_FLOW - ingestion_metrics.total_size_bytes
+        name: GCP_VPC_FLOW
+      - axisId: GMAIL_LOGS - ingestion_metrics.total_size_bytes
+        id: GMAIL_LOGS - ingestion_metrics.total_size_bytes
+        name: GMAIL_LOGS
+      - axisId: GSUITE_AUDIT - ingestion_metrics.total_size_bytes
+        id: GSUITE_AUDIT - ingestion_metrics.total_size_bytes
+        name: GSUITE_AUDIT
+      - axisId: LINUX_OS - ingestion_metrics.total_size_bytes
+        id: LINUX_OS - ingestion_metrics.total_size_bytes
+        name: LINUX_OS
+      - axisId: POWERSHELL - ingestion_metrics.total_size_bytes
+        id: POWERSHELL - ingestion_metrics.total_size_bytes
+        name: POWERSHELL
+      - axisId: SNORT_IDS - ingestion_metrics.total_size_bytes
+        id: SNORT_IDS - ingestion_metrics.total_size_bytes
+        name: SNORT_IDS
+      - axisId: SQUID_WEBPROXY - ingestion_metrics.total_size_bytes
+        id: SQUID_WEBPROXY - ingestion_metrics.total_size_bytes
+        name: SQUID_WEBPROXY
+      - axisId: UDM - ingestion_metrics.total_size_bytes
+        id: UDM - ingestion_metrics.total_size_bytes
+        name: UDM
+      - axisId: WAZUH - ingestion_metrics.total_size_bytes
+        id: WAZUH - ingestion_metrics.total_size_bytes
+        name: WAZUH
+      - axisId: WINDOWS_AD - ingestion_metrics.total_size_bytes
+        id: WINDOWS_AD - ingestion_metrics.total_size_bytes
+        name: WINDOWS_AD
+      - axisId: WINDOWS_SYSMON - ingestion_metrics.total_size_bytes
+        id: WINDOWS_SYSMON - ingestion_metrics.total_size_bytes
+        name: WINDOWS_SYSMON
+      - axisId: WINEVTLOG - ingestion_metrics.total_size_bytes
+        id: WINEVTLOG - ingestion_metrics.total_size_bytes
+        name: WINEVTLOG
+      showLabels: true
+      showValues: true
+      tickDensity: default
+      tickDensityCustom: 5
+      type: linear
+      unpinAxis: false
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - body_text: '**Please note that the dashboards below have timelines that are pre-selected
+      and the "Time" filter doesn''t apply to them**'
+    col: 0
+    height: 2
+    name: ""
+    row: 23
+    title_text: ""
+    type: text
+    width: 24
+  - col: 0
+    column_limit: 50
+    comparison_reverse_colors: false
+    comparison_type: value
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    custom_color_enabled: true
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: entity_graph_connector
+    fields:
+    - entity_graph.count
+    - entity_graph.metadata__entity_type_enum_name
+    filters: {}
+    header_font_size: 12
+    header_text_alignment: left
+    height: 6
+    hidden_pivots: {}
+    hide_row_totals: false
+    hide_totals: false
+    label_density: 25
+    label_type: labPer
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time: entity_graph.time_filter
+    model: scn
+    name: Recorded Future Ingestion by Entity Type
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 3
+    rows_font_size: 12
+    series_labels:
+      "3": Domain
+    show_comparison: false
+    show_comparison_label: true
+    show_null_labels: false
+    show_row_numbers: true
+    show_silhouette: false
+    show_single_value_title: true
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - entity_graph.count desc 0
+    stacking: ""
+    table_theme: white
+    title: Recorded Future Ingestion by Entity Type
+    total: true
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_text: true
+    type: looker_pie
+    value_labels: legend
+    width: 12
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 12
+    column_limit: 50
+    defaults_version: 1
+    explore: entity_graph_connector
+    fields:
+    - entity_graph.metadata__entity_type_enum_name
+    - entity_graph.metadata__collected_timestamp_date
+    - entity_graph.count
+    fill_fields:
+    - entity_graph.metadata__collected_timestamp_date
+    filters: {}
+    height: 6
+    hidden_pivots: {}
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time: entity_graph.time_filter
+    model: scn
+    name: Recorded Future Ingestion by Entity Type and Date
+    pivots:
+    - entity_graph.metadata__entity_type_enum_name
+    plot_size_by_field: false
+    point_style: none
+    row: 3
+    show_null_points: true
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - entity_graph.metadata__entity_type_enum_name
+    - entity_graph.metadata__collected_timestamp_date desc
+    stacking: ""
+    title: Recorded Future Ingestion by Entity Type and Date
+    trellis: ""
+    type: looker_line
+    width: 12
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  filters:
+  - allow_multiple_values: true
+    default_value: 7 days
+    explore: ingestion_metrics_connector
+    field: ingestion_metrics.period_filter
+    listens_to_filters: []
+    model: scn
+    name: Time
+    required: true
+    title: Time
+    type: field_filter
+    ui_config:
+      display: popover
+      options: []
+      type: advanced
+  layout: newspaper
+  preferred_viewer: dashboards-next
+  title: Recorded Future Data Ingestion
+metadata:
+  exported_at: "2025-01-24T15:09:39-08:00"
+  file_fingerprint: "685274026230983102818340829830089297238"
+  looker_version: 24.18.128
+  version: "1"
