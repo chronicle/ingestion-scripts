@@ -8,7 +8,7 @@ Instructions for how to deploy ingestion scripts to import Recorded Future Indic
 
 Contact: [support@recordedfuture.com](mailto:support@recordedfuture.com)
 
-## Updates
+### Updates over legacy version
 
 These ingestion scripts contain significant updates over the [legacy integration](https://cloud.google.com/chronicle/docs/reference/feed-management-api#recorded-future-ioc), notably:
 
@@ -19,6 +19,18 @@ These ingestion scripts contain significant updates over the [legacy integration
 - Populates UDM fields to more closely align with Google SecOps best practices
 - Includes Yara-L rules to correlate threat intelligence against
 - Includes dashboards to get a global view of Recorded Future Threat intelligence in your SIEM environment
+
+## Prerequisites
+
+Before Installing the ingestion script, you must take the following steps
+
+- Acquire a Recorded Future API Token and place it in GCP secrets manager. Note the path of the secret and use it for the `RECORDED_FUTURE_SECRET` value in .env.yml
+- Acquire Google SecOps credentials from the SecOps console at SIEM Settings->Collection Agents->Ingestion Authentication File. Place it in GCP secrets manager and use it for the `CHRONICLE_SERVICE_ACCOUNT` value in .env.yml
+- Create (or use an existing service account) and use it's email in the `<SERVICE_ACCOUNT_EMAIL>` placeholders specified below. Assign the Service Account the following permissions
+    - `Cloud Functions Invoker`
+    - `Cloud Run Invoker`
+    - `Service Account User`
+    - `Secret Manager Secret Accessor`. Although this permission can be granted project-wide, best practice is to grant only for the two secrets created above
 
 ## Installation
 
@@ -50,16 +62,16 @@ You can find full instructions on deploying ingestion scripts as cloud fun funct
 Deploy the ingestion script following using the following gcloud CLI command while inside the `src` directory
 
 ```
- gcloud functions deploy rf_ingest --entry-point main --trigger-http --runtime python311 --env-vars-file .env.yml --set-build-env-vars GOOGLE_VENDOR_PIP_DEPENDENCIES=deps -service-account <SERVICE_ACCOUNT_EMAIL> --memory 2048MB --timeout=3600s
+ gcloud functions deploy rf_ingest --entry-point main --trigger-http --runtime python311 --env-vars-file .env.yml -service-account <SERVICE_ACCOUNT_EMAIL> --memory 2048MB --timeout=3600s
 
 ```
 
  After deploying the script, make sure you schedule it to run regularly by creating a Cloud Scheduler Job. The script should be scheduled to run at least daily. You can also configure the scheduler through the UI from [this documentation](https://cloud.google.com/run/docs/triggering/using-scheduler). We recommend setting the timeout/deadline value to 30 minutes
- 
+
  You can create a job with gcloud cli with the below command
 
 ```
-gcloud scheduler jobs create http rf-secops-ingest --schedule="0 0 * * *" --uri="[PATH_OF_RUN_FUNCTION_URL]" --oidc-service-account-email=[OIDC_SERVICE_ACCOUNT_EMAIL] --http-method=POST --attempt-deadline 30m
+gcloud scheduler jobs create http rf-secops-ingest --schedule="0 0 * * *" --uri="<PATH_OF_RUN_FUNCTION_URL>" --oidc-service-account-email=<SERVICE_ACCOUNT_EMAIL> --http-method=POST --attempt-deadline 30m
 ```
 
 ### Install New Parser
