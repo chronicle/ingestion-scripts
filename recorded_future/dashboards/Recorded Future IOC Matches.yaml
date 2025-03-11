@@ -1,0 +1,716 @@
+lookml:
+- dashboard: recorded_future_ioc_matches
+  description: ""
+  elements:
+  - col: 0
+    column_limit: 50
+    defaults_version: 1
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.count
+    - ioc_matches.event_timestamp_time
+    - ioc_matches.ioc_type
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    height: 8
+    hidden_pivots: {}
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Recorded Future IOC Matches Over Time by Type
+    ordering: none
+    pivots:
+    - ioc_matches.ioc_type
+    plot_size_by_field: false
+    point_style: none
+    row: 12
+    show_null_labels: false
+    show_null_points: true
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ioc_matches.count desc 0
+    stacking: ""
+    title: Recorded Future IOC Matches Over Time by Type
+    totals_color: '#808080'
+    trellis: ""
+    type: looker_line
+    width: 24
+    x_axis_gridlines: false
+    x_axis_label: Date
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axes:
+    - label: Record Count
+      orientation: left
+      series:
+      - axisId: ioc_matches.count
+        id: Abused or free TLD Related - ioc_matches.count
+        name: Abused or free TLD Related
+      - axisId: ioc_matches.count
+        id: Bitcoin Mining and related - ioc_matches.count
+        name: Bitcoin Mining and related
+      - axisId: ioc_matches.count
+        id: DDoS Source - ioc_matches.count
+        name: DDoS Source
+      - axisId: ioc_matches.count
+        id: Domain or IP Related to a Dynamic DNS Entry or Request - ioc_matches.count
+        name: Domain or IP Related to a Dynamic DNS Entry or Request
+      - axisId: ioc_matches.count
+        id: Driveby Source - ioc_matches.count
+        name: Driveby Source
+      - axisId: ioc_matches.count
+        id: Drop site for logs or stolen credentials - ioc_matches.count
+        name: Drop site for logs or stolen credentials
+      - axisId: ioc_matches.count
+        id: GoToMyPC and similar remote access services - ioc_matches.count
+        name: GoToMyPC and similar remote access services
+      - axisId: ioc_matches.count
+        id: Host Performing Scanning - ioc_matches.count
+        name: Host Performing Scanning
+      - axisId: ioc_matches.count
+        id: IP Check Services - ioc_matches.count
+        name: IP Check Services
+      - axisId: ioc_matches.count
+        id: Known compromised or Hostile - ioc_matches.count
+        name: Known compromised or Hostile
+      - axisId: ioc_matches.count
+        id: Known Good Public Utility - ioc_matches.count
+        name: Known Good Public Utility
+      - axisId: ioc_matches.count
+        id: Known Infected Bot - ioc_matches.count
+        name: Known Infected Bot
+      - axisId: ioc_matches.count
+        id: Known Spam Source - ioc_matches.count
+        name: Known Spam Source
+      - axisId: ioc_matches.count
+        id: Malware Command and Control Server - ioc_matches.count
+        name: Malware Command and Control Server
+      - axisId: ioc_matches.count
+        id: Observed serving executables - ioc_matches.count
+        name: Observed serving executables
+      - axisId: ioc_matches.count
+        id: P2P Node - ioc_matches.count
+        name: P2P Node
+      - axisId: ioc_matches.count
+        id: POLICY Chat Server - ioc_matches.count
+        name: POLICY Chat Server
+      - axisId: ioc_matches.count
+        id: POLICY Tor Node - ioc_matches.count
+        name: POLICY Tor Node
+      - axisId: ioc_matches.count
+        id: Proxy Host - ioc_matches.count
+        name: Proxy Host
+      - axisId: ioc_matches.count
+        id: Questionable Gaming Site - ioc_matches.count
+        name: Questionable Gaming Site
+      - axisId: ioc_matches.count
+        id: Self Signed SSL or other suspicious encryption - ioc_matches.count
+        name: Self Signed SSL or other suspicious encryption
+      - axisId: ioc_matches.count
+        id: Spyware Reporting Server - ioc_matches.count
+        name: Spyware Reporting Server
+      - axisId: ioc_matches.count
+        id: SSH or other brute forcer - ioc_matches.count
+        name: SSH or other brute forcer
+      - axisId: ioc_matches.count
+        id: Target of a DDoS - ioc_matches.count
+        name: Target of a DDoS
+      - axisId: ioc_matches.count
+        id: Undesirable but not illegal - ioc_matches.count
+        name: Undesirable but not illegal
+      - axisId: ioc_matches.count
+        id: Verizon-CDN-Malicious-Activity - ioc_matches.count
+        name: Verizon-CDN-Malicious-Activity
+      showLabels: true
+      showValues: true
+      tickDensity: default
+      tickDensityCustom: 5
+      type: linear
+      unpinAxis: false
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 0
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.count
+    - ioc_matches.category
+    - ioc_matches.ioc_type
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    header_font_size: "12"
+    header_text_alignment: left
+    height: 6
+    hide_row_totals: false
+    hide_totals: false
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 30
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Top 10 IOC Matches by Category, Type and Count
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 26
+    rows_font_size: "12"
+    series_labels:
+      ioc_matches.count: Record Count
+    show_null_labels: false
+    show_null_points: true
+    show_row_numbers: false
+    show_row_totals: true
+    show_silhouette: false
+    show_sql_query_menu_options: false
+    show_totals: true
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - ioc_matches.count desc
+    - ioc_matches.category
+    stacking: ""
+    table_theme: unstyled
+    title: Top 10 IOC Matches by Category, Type and Count
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_column_names: false
+    truncate_text: true
+    type: looker_grid
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 8
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.count
+    - ioc_matches.ioc_value
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    header_font_size: "12"
+    header_text_alignment: left
+    height: 6
+    hide_row_totals: false
+    hide_totals: false
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 30
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Top 10 IOC Values
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 26
+    rows_font_size: "12"
+    series_labels:
+      ioc_matches.count: Record Count
+    show_null_labels: false
+    show_null_points: true
+    show_row_numbers: false
+    show_row_totals: true
+    show_silhouette: false
+    show_sql_query_menu_options: false
+    show_totals: true
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - ioc_matches.count desc
+    stacking: ""
+    table_theme: unstyled
+    title: Top 10 IOC Values
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_column_names: false
+    truncate_text: true
+    type: looker_grid
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 16
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.count
+    - ioc_matches.ioc_value
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    header_font_size: "12"
+    header_text_alignment: left
+    height: 6
+    hide_row_totals: false
+    hide_totals: false
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 30
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Top 10 Rarely Seen Values
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 26
+    rows_font_size: "12"
+    series_labels:
+      ioc_matches.count: Record Count
+    show_null_labels: false
+    show_null_points: true
+    show_row_numbers: false
+    show_row_totals: true
+    show_silhouette: false
+    show_sql_query_menu_options: false
+    show_totals: true
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - ioc_matches.count
+    stacking: ""
+    table_theme: unstyled
+    title: Top 10 Rarely Seen Values
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_column_names: false
+    truncate_text: true
+    type: looker_grid
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 0
+    defaults_version: 1
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.count
+    - ioc_matches.ioc_value_domain
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+      ioc_matches.ioc_value_domain: -NULL
+    height: 6
+    label_density: 25
+    legend_position: center
+    limit: 30
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Top 10 Domains IOC Indicators
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 20
+    series_labels:
+      ioc_matches.count: Count
+    show_null_labels: false
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ioc_matches.count desc
+    stacking: ""
+    title: Top 10 Domains IOC Indicators
+    totals_color: '#808080'
+    trellis: ""
+    type: looker_bar
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 8
+    defaults_version: 1
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.ioc_value_ip
+    - ioc_matches.count
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+      ioc_matches.ioc_type: '"IOC_TYPE_IP"'
+    height: 6
+    label_density: 25
+    legend_position: center
+    limit: 30
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Top 10 IP IOC Indicators
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 20
+    series_labels:
+      ioc_matches.count: Count
+    show_null_labels: false
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ioc_matches.count desc
+    stacking: ""
+    title: Top 10 IP IOC Indicators
+    totals_color: '#808080'
+    trellis: ""
+    type: looker_bar
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 16
+    column_limit: 50
+    defaults_version: 1
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.asset_hostname
+    - ioc_matches.count
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    height: 6
+    label_density: 25
+    legend_position: center
+    limit: 30
+    limit_displayed_rows: true
+    limit_displayed_rows_values:
+      first_last: first
+      num_rows: "10"
+      show_hide: show
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Top 10 Assets by IOC Matches
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 20
+    series_labels:
+      ioc_matches.count: Count
+    show_null_labels: false
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - ioc_matches.count desc
+    stacking: ""
+    title: Top 10 Assets by IOC Matches
+    totals_color: '#808080'
+    trellis: ""
+    type: looker_bar
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 0
+    comparison_reverse_colors: false
+    comparison_type: value
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    custom_color_enabled: true
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.count
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    height: 6
+    limit: 500
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Recorded Future IOC Match Count
+    row: 0
+    show_comparison: false
+    show_comparison_label: true
+    show_single_value_title: true
+    title: Recorded Future IOC Match Count
+    type: single_value
+    width: 7
+  - col: 7
+    column_limit: 50
+    defaults_version: 1
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.ioc_type
+    - ioc_matches.count
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    height: 6
+    label_type: labPer
+    limit: 500
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Recorded Future IOC Matches
+    row: 0
+    sorts:
+    - ioc_matches.count desc 0
+    title: Recorded Future IOC Matches
+    type: looker_pie
+    value_labels: legend
+    width: 9
+  - col: 16
+    column_limit: 50
+    conditional_formatting_include_nulls: false
+    conditional_formatting_include_totals: false
+    defaults_version: 1
+    enable_conditional_formatting: false
+    explore: ioc_matches_connector
+    fields:
+    - ioc_matches.confidence_score
+    - ioc_matches.count
+    filters:
+      ioc_matches.feed_name: Recorded Future IOC
+    header_font_size: 12
+    header_text_alignment: left
+    height: 6
+    hide_row_totals: false
+    hide_totals: false
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time: ioc_matches.event_timestamp_filter
+    model: scn
+    name: Recorded Future IOC Matches by Risk Score
+    ordering: none
+    plot_size_by_field: false
+    point_style: none
+    row: 0
+    rows_font_size: 12
+    show_null_labels: false
+    show_null_points: true
+    show_row_numbers: true
+    show_silhouette: false
+    show_totals_labels: false
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    size_to_fit: true
+    sorts:
+    - ioc_matches.confidence_score desc
+    stacking: ""
+    table_theme: white
+    title: Recorded Future IOC Matches by Risk Score
+    totals_color: '#808080'
+    transpose: false
+    trellis: ""
+    truncate_text: true
+    type: looker_column
+    width: 8
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  - col: 0
+    column_limit: 50
+    defaults_version: 1
+    explore: rule_detections_connector
+    fields:
+    - rule_detections__detection.rule_name
+    - rule_detections__detection.count
+    - rule_detections.detection_time_date
+    fill_fields:
+    - rule_detections.detection_time_date
+    filters:
+      rule_detections__detection.rule_name: rf^_%
+    height: 6
+    hidden_pivots: {}
+    interpolation: linear
+    label_density: 25
+    legend_position: center
+    limit: 500
+    limit_displayed_rows: false
+    listen:
+      Time: rule_detections.detection_time_date
+    model: scn
+    name: Recorded Future Rule Detections
+    pivots:
+    - rule_detections__detection.rule_name
+    plot_size_by_field: false
+    point_style: none
+    row: 6
+    show_null_points: true
+    show_value_labels: false
+    show_view_names: false
+    show_x_axis_label: true
+    show_x_axis_ticks: true
+    show_y_axis_labels: true
+    show_y_axis_ticks: true
+    sorts:
+    - rule_detections__detection.rule_name
+    - rule_detections.detection_time_date desc
+    stacking: ""
+    title: Recorded Future Rule Detections
+    trellis: ""
+    type: looker_line
+    width: 24
+    x_axis_gridlines: false
+    x_axis_reversed: false
+    x_axis_scale: auto
+    y_axis_combined: true
+    y_axis_gridlines: true
+    y_axis_reversed: false
+    y_axis_scale_mode: linear
+    y_axis_tick_density: default
+    y_axis_tick_density_custom: 5
+  filters:
+  - allow_multiple_values: true
+    default_value: 7 days
+    explore: ioc_matches_connector
+    field: ioc_matches.event_timestamp_filter
+    listens_to_filters: []
+    model: scn
+    name: Time
+    required: true
+    title: Time
+    type: field_filter
+    ui_config:
+      display: popover
+      options: []
+      type: advanced
+  layout: newspaper
+  preferred_viewer: dashboards-next
+  title: Recorded Future IOC Matches
+metadata:
+  exported_at: "2025-01-30T08:10:09-08:00"
+  file_fingerprint: "172383033582337446685856768615939364997"
+  looker_version: 24.18.128
+  version: "1"
