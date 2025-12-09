@@ -22,6 +22,8 @@ data from Google Threat Intelligence API.
     - `Secret Manager Secret Access`
     - `Storage Admin`
     - `Chronicle API Editor`
+    - `Role Viewer`
+    - `Cloud Run Invoker`
 - GCP Services
   - Before using the below services, ensure the [Google APIs](#enabling-required-apis) are enabled in your GCP project
     - `Cloud Run Function (4-core CPU or higher is recommended)`
