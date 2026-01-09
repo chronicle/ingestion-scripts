@@ -1253,6 +1253,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     self.assertEqual(threat_list_data[0]["data"]["type"], "ip")
     self.assertEqual(threat_list_data[2]["data"]["type"], "domain")
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_threat_lists_start_time")
   @patch(f"{INGESTION_SCRIPTS_PATH}utility.add_one_hour_to_formatted_time")
   @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_environment_variable")
   @patch.object(
@@ -1278,6 +1279,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
       mock_fetch_attack_data,
       mock_get_env_var,
       mock_add_hour,
+      mock_start_time
   ):
     """Test actual execution through ingest_events_for_threat_type method - MITRE enabled with file IOC."""
     # Arrange
@@ -1286,6 +1288,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     mock_check_time.side_effect = [False, True]  # Process once, then stop
     mock_get_checkpoint.return_value = None
     mock_add_hour.return_value = "2023-01-01T01:00:00Z"
+    mock_start_time.return_value = "2023-01-01T00:00:00Z"
 
     # Mock threat data response with file type IOC
     mock_threat_response = {
@@ -1313,7 +1316,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
 
     # Act - Call the actual method that contains lines 454-459
     gti_utility.ingest_events_for_threat_type(
-        "malware", None, "2023-01-01T00:00:00Z"
+        "malware", None
     )
 
     # Assert - Verify that lines 454-459 were executed
@@ -1334,6 +1337,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     }
     self.assertEqual(ingested_data[0]["data"], expected_data)
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_threat_lists_start_time")
   @patch(f"{INGESTION_SCRIPTS_PATH}utility.add_one_hour_to_formatted_time")
   @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_environment_variable")
   @patch.object(
@@ -1359,6 +1363,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
       mock_fetch_attack_data,
       mock_get_env_var,
       mock_add_hour,
+      mock_start_time,
   ):
     """Test ingest_events_for_threat_type method - MITRE disabled."""
     # Arrange
@@ -1367,6 +1372,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     mock_check_time.side_effect = [False, True]  # Process once, then stop
     mock_get_checkpoint.return_value = None
     mock_add_hour.return_value = "2023-01-01T01:00:00Z"
+    mock_start_time.return_value = "2023-01-01T00:00:00Z"
 
     # Mock threat data response with file type IOC
     mock_threat_response = {
@@ -1388,7 +1394,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
 
     # Act - Call the actual method that contains lines 454-459
     gti_utility.ingest_events_for_threat_type(
-        "malware", None, "2023-01-01T00:00:00Z"
+        "malware", None
     )
 
     # Assert - Verify that line 453 was executed but lines 454-459 were skipped
@@ -1854,6 +1860,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     mock_bucket.blob.assert_called_once_with(checkpoint_file)
     mock_blob.exists.assert_called_once()
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_threat_lists_start_time")
   @patch(
       f"{INGESTION_SCRIPTS_PATH}gti_client.utility.add_one_hour_to_formatted_time"
   )
@@ -1874,6 +1881,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
       mock_ingest_events,
       mock_check_time,
       mock_add_hour,
+      mock_start_time,
   ):
     """Test successful ingestion of events for a threat type."""
     # Arrange
@@ -1895,13 +1903,14 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
         "status": True,
         "data": {"iocs": mock_threat_data},
     }
+    mock_start_time.return_value = "2024-01-01T09:00:00Z"
 
     # Create the utility instance
     gti_utility = GoogleThreatIntelligenceUtility(api_token, bucket_name)
 
     # Act
     gti_utility.ingest_events_for_threat_type(
-        "malware", "test_query", "2024-01-01T09:00:00Z"
+        "malware", "test_query"
     )
 
     # Assert
@@ -1929,10 +1938,11 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
         " SecOps."
     )
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_threat_lists_start_time")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utils.cloud_logging")
   @patch.object(GoogleThreatIntelligenceUtility, "get_gti_headers_with_token")
   def test_ingest_events_for_threat_type_invalid_threat_type(
-      self, mock_get_headers, mock_cloud_logging
+      self, mock_get_headers, mock_cloud_logging, mock_start_time
   ):
     """Test ingestion with invalid threat type."""
     # Arrange
@@ -1940,13 +1950,14 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     bucket_name = "test_bucket"
     mock_headers = {"accept": "application/json"}
     mock_get_headers.return_value = mock_headers
+    mock_start_time.return_value = "2024-01-01T09:00:00Z"
 
     # Create the utility instance
     gti_utility = GoogleThreatIntelligenceUtility(api_token, bucket_name)
 
     # Act
     gti_utility.ingest_events_for_threat_type(
-        "invalid_type", "test_query", "2024-01-01T09:00:00Z"
+        "invalid_type", "test_query"
     )
 
     # Assert
@@ -1955,6 +1966,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
         f" {constant.ALL_THREAT_LISTS}"
     )
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_threat_lists_start_time")
   @patch(f"{INGESTION_SCRIPTS_PATH}utility.check_time_current_hr")
   @patch.object(GoogleThreatIntelligenceUtility, "_get_last_checkpoint")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utils.cloud_logging")
@@ -1965,6 +1977,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
       mock_cloud_logging,
       mock_get_checkpoint,
       mock_check_time,
+      mock_start_time
   ):
     """Test ingestion when current hour is reached."""
     # Arrange
@@ -1975,13 +1988,14 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
 
     mock_get_checkpoint.return_value = None
     mock_check_time.return_value = True  # Current hour reached immediately
+    mock_start_time.return_value = "2024-01-01T09:00:00Z"
 
     # Create the utility instance
     gti_utility = GoogleThreatIntelligenceUtility(api_token, bucket_name)
 
     # Act
     gti_utility.ingest_events_for_threat_type(
-        "malware", "test_query", "2024-01-01T09:00:00Z"
+        "malware", "test_query"
     )
 
     # Assert
@@ -1990,6 +2004,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
         " for malware."
     )
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_threat_lists_start_time")
   @patch.object(GoogleThreatIntelligenceUtility, "fetch_threat_data")
   @patch(f"{INGESTION_SCRIPTS_PATH}utility.check_time_current_hr")
   @patch.object(GoogleThreatIntelligenceUtility, "_get_last_checkpoint")
@@ -2002,6 +2017,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
       mock_get_checkpoint,
       mock_check_time,
       mock_fetch_threat_data,
+      mock_start_time,
   ):
     """Test ingestion when fetch_threat_data returns an error."""
     # Arrange
@@ -2009,6 +2025,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     bucket_name = "test_bucket"
     mock_headers = {"accept": "application/json"}
     mock_get_headers.return_value = mock_headers
+    mock_start_time.return_value = "2024-01-01T09:00:00Z"
 
     mock_get_checkpoint.return_value = None
     mock_check_time.return_value = False
@@ -2022,7 +2039,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
 
     # Act
     gti_utility.ingest_events_for_threat_type(
-        "malware", "test_query", "2024-01-01T09:00:00Z"
+        "malware", "test_query"
     )
 
     # Assert
@@ -2030,6 +2047,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
         "Error occurred while fetching malware data. Error: API error occurred"
     )
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}utility.get_threat_lists_start_time")
   @patch.object(GoogleThreatIntelligenceUtility, "fetch_threat_data")
   @patch(f"{INGESTION_SCRIPTS_PATH}utility.check_time_current_hr")
   @patch.object(GoogleThreatIntelligenceUtility, "_get_last_checkpoint")
@@ -2042,6 +2060,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
       mock_get_checkpoint,
       mock_check_time,
       mock_fetch_threat_data,
+      mock_start_time,
   ):
     """Test ingestion when a general exception occurs."""
     # Arrange
@@ -2049,6 +2068,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     bucket_name = "test_bucket"
     mock_headers = {"accept": "application/json"}
     mock_get_headers.return_value = mock_headers
+    mock_start_time.return_value = "2024-01-01T09:00:00Z"
 
     mock_get_checkpoint.side_effect = Exception("Checkpoint error")
 
@@ -2057,7 +2077,7 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
 
     # Act
     gti_utility.ingest_events_for_threat_type(
-        "malware", "test_query", "2024-01-01T09:00:00Z"
+        "malware", "test_query"
     )
 
     # Assert
@@ -4360,15 +4380,21 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
           constant.CHECKPOINT_KEY_TO_SHARD[threat_list], checkpoint_file
       )
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utils.get_env_var")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.requests.get")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.resourcemanager_v3.ProjectsClient")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utility.get_environment_variable")
   def test_check_sufficient_permissions_on_service_account_sufficient(
-      self, mock_get_env_var, mock_projects_client, mock_requests_get
+      self,
+      mock_get_env_var,
+      mock_projects_client,
+      mock_requests_get,
+      mock_utils_get_env_var
   ):
     """Test check_sufficient_permissions_on_service_account with sufficient permissions."""
     self.mock_check_permissions_patcher.stop()
     mock_get_env_var.return_value = "123456789"
+    mock_utils_get_env_var.return_value = None
     mock_requests_get.return_value.text = "test@project.iam.gserviceaccount.com"
     mock_policy = MagicMock()
     mock_binding = MagicMock()
@@ -4383,6 +4409,35 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     ):
       result = self.gti_client.check_sufficient_permissions_on_service_account()
       self.assertTrue(result)
+    self.mock_check_permissions_patcher.start()
+
+  @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utils.get_env_var")
+  @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.requests.get")
+  @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.resourcemanager_v3.ProjectsClient")
+  @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utility.get_environment_variable")
+  def test_check_sufficient_permissions_on_service_account_skipped(
+      self,
+      mock_get_env_var,
+      mock_projects_client,
+      mock_requests_get,
+      mock_utils_get_env_var
+  ):
+    """Test check_sufficient_permissions_on_service_account when service account is provided."""
+    self.mock_check_permissions_patcher.stop()
+    mock_utils_get_env_var.return_value = "test-sa@test-project.iam.gserviceaccount.com"
+
+    _ = GoogleThreatIntelligenceUtility(
+        "test_api_token", "test_bucket"
+    )
+    # The check is done in the __init__, so we just need to assert on the mocks.
+    mock_projects_client.assert_not_called()
+    mock_requests_get.assert_not_called()
+    mock_utils_get_env_var.assert_called_once_with(
+        "CHRONICLE_SERVICE_ACCOUNT", required=False
+    )
+    self.mock_logging.assert_any_call(
+        "Permission check skipped as static service account key is provided."
+        " test-sa@test-project.iam.gserviceaccount.com")
     self.mock_check_permissions_patcher.start()
 
   @patch(
@@ -4450,16 +4505,22 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
         f"The specified bucket '{bucket_name}' does not exist.", severity="ERROR"
     )
 
+  @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utils.get_env_var")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.requests.get")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.resourcemanager_v3.ProjectsClient")
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utility.get_environment_variable")
   def test_check_sufficient_permissions_on_service_account_insufficient(
-      self, mock_get_env_var, mock_projects_client, mock_requests_get
+      self,
+      mock_get_env_var,
+      mock_projects_client,
+      mock_requests_get,
+      mock_utils_get_env_var
   ):
     """Test check_sufficient_permissions_on_service_account with insufficient permissions."""
     self.mock_check_permissions_patcher.stop()
     mock_get_env_var.return_value = "123456789"
     mock_requests_get.return_value.text = "test@project.iam.gserviceaccount.com"
+    mock_utils_get_env_var.return_value = None
     mock_policy = MagicMock()
     mock_binding = MagicMock()
     mock_binding.role = "roles/viewer"
@@ -4476,11 +4537,13 @@ class TestGoogleThreatIntelligenceUtility(unittest.TestCase):
     self.mock_check_permissions_patcher.start()
 
   @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utility.get_environment_variable")
+  @patch(f"{INGESTION_SCRIPTS_PATH}gti_client.utils.get_env_var")
   def test_check_sufficient_permissions_on_service_account_exception(
-      self, mock_get_env_var
+      self, mock_get_env_var, mock_utils_get_env_var
   ):
     """Test check_sufficient_permissions_on_service_account with exception."""
     self.mock_check_permissions_patcher.stop()
+    mock_utils_get_env_var.return_value = ""
     mock_get_env_var.side_effect = Exception("Some error")
 
     with self.assertRaises(Exception):

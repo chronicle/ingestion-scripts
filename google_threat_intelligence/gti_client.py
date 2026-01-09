@@ -602,15 +602,13 @@ class GoogleThreatIntelligenceUtility:
       )
 
   def ingest_events_for_threat_type(
-      self, threat_type, threat_list_query, threat_list_start_time
-  ):
+      self, threat_type, threat_list_query
+  ) -> None:
     """Fetch and ingest events for threat type from Google Threat Intelligence.
 
     Args:
         threat_type (str): The type of threat to fetch events for.
         threat_list_query (str): The query to filter the threat list by.
-        threat_list_start_time (str): The start time from which to fetch threat
-          list events in ISO 8601 format.
 
     Raises:
         Exception: If an error occurs during the process of fetching and
@@ -627,10 +625,12 @@ class GoogleThreatIntelligenceUtility:
       params = {"limit": constant.THREAT_FEED_LIMIT}
       if threat_list_query:
         params["query"] = threat_list_query
-      fetch_data_from = threat_list_start_time
       last_checkpoint = self._get_last_checkpoint(threat_type)
-      if last_checkpoint:
-        fetch_data_from = last_checkpoint
+      fetch_data_from = (
+          last_checkpoint
+          if last_checkpoint
+          else utility.get_threat_lists_start_time()
+      )
       while True:
         if utility.check_time_current_hr(fetch_data_from):
           utils.cloud_logging(
@@ -713,7 +713,6 @@ class GoogleThreatIntelligenceUtility:
       threat_list_query = utility.get_environment_variable(
           constant.ENV_VAR_THREAT_LIST_QUERY
       )
-      threat_list_start_time = utility.get_threat_lists_start_time()
 
       with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
@@ -723,7 +722,6 @@ class GoogleThreatIntelligenceUtility:
                   self.ingest_events_for_threat_type,
                   threat_type,
                   threat_list_query,
-                  threat_list_start_time,
               )
           )
 
@@ -1018,39 +1016,56 @@ class GoogleThreatIntelligenceUtility:
 
     missing_permissions = set()
     try:
-      client = resourcemanager_v3.ProjectsClient()
-      chronicle_project_number = utility.get_environment_variable(
-          env_constants.ENV_CHRONICLE_PROJECT_NUMBER
+      service_account = utils.get_env_var(
+          env_constants.ENV_CHRONICLE_SERVICE_ACCOUNT,
+          required=False,
       )
-      resource_name = f"projects/{chronicle_project_number}"
-      policy = client.get_iam_policy(request={"resource": resource_name})
-
-      service_account_email = requests.get(
-          "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email",
-          headers={"Metadata-Flavor": "Google"},
-      ).text
-      for permission_name, role in constant.PERMISSION_DETAILS.items():
-        if not any(
-            "serviceAccount:" + service_account_email in binding.members
-            for binding in policy.bindings
-            if binding.role == role
-        ):
-          missing_permissions.add(permission_name)
-
-      if missing_permissions:
-        error_msg = (
-            f"Service account - {service_account_email} does not have"
-            " sufficient permissions."
+      if not service_account:
+        client = resourcemanager_v3.ProjectsClient()
+        chronicle_project_number = utils.get_env_var(
+            env_constants.ENV_CHRONICLE_PROJECT_NUMBER,
+            required=True,
         )
-        utils.cloud_logging(f"{error_msg}")
-        raise GCPPermissionDeniedError(
-            message=error_msg,
-            resource=resource_name,
-            permissions=list(missing_permissions),
-        )
+        resource_name = f"projects/{chronicle_project_number}"
+        policy = client.get_iam_policy(request={"resource": resource_name})
+
+        service_account_email = requests.get(
+            "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email",
+            headers={"Metadata-Flavor": "Google"},
+        ).text
+        for permission_name, role in constant.PERMISSION_DETAILS.items():
+          if not any(
+              "serviceAccount:" + service_account_email in binding.members
+              for binding in policy.bindings
+              if binding.role == role
+          ):
+            missing_permissions.add(permission_name)
+
+        if missing_permissions:
+          error_msg = (
+              f"Service account - {service_account_email} does not have"
+              " sufficient permissions."
+          )
+          utils.cloud_logging(
+              "Service account - %s does not have sufficient permissions.",
+              service_account_email
+          )
+          raise GCPPermissionDeniedError(
+              message=error_msg,
+              resource=resource_name,
+              permissions=list(missing_permissions),
+          )
+        else:
+          utils.cloud_logging("Service account has sufficient permissions.")
+          return True
       else:
-        utils.cloud_logging("Service account has sufficient permissions.")
+        utils.cloud_logging(
+            "Permission check skipped as static service account key is"
+            f" provided. {service_account}"
+        )
         return True
     except Exception as e:
       utils.cloud_logging(f"Unexpected error: {repr(e)}")
-      raise Exception(f"Unexpected error: {e}") from e  # pylint: disable=broad-exception-raised
+      raise RuntimeError(
+          "An unexpected error occurred during service account permission check"
+      ) from e

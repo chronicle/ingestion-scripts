@@ -1,6 +1,7 @@
 # Google Threat Intelligence Google SecOps Integration
 
-This integration aims to enable seamless ingestion, parsing, and visualization
+The data collection using ingestion script from the Google Threat Intelligence
+aims to enable seamless ingestion, parsing, and visualization
 of Google Threat Intelligence data within Google SecOps SIEM. This integration
 will allow Google SecOps SIEM to receive real-time Threat lists and IoC Streams
 data from Google Threat Intelligence API.
@@ -11,6 +12,11 @@ data from Google Threat Intelligence API.
 - Data collection using ingestion script from the Google Threat Intelligence
 - Google Threat Intelligence data ingested into Google SecOps
 - Collected data will be parsed through corresponding parsers in Google SecOps
+
+**Note:** If you are a Google SecOps customer with Enterprise Plus, data
+collection using the ingestion script from Google Threat Intelligence is not
+strictly required. However, it still provides value by enabling the ingestion of
+data from your Threat Profile.
 
 ## Pre-Requisites
 
