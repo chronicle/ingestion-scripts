@@ -121,6 +121,7 @@ enable_apis() {
         storage-component.googleapis.com
         secretmanager.googleapis.com
         chronicle.googleapis.com
+        cloudresourcemanager.googleapis.com
     )
     for api in "${APIS[@]}"; do
         if ! gcloud services list --project="$PROJECT_ID" --filter="NAME:$api" --format="value(NAME)" | grep -q "$api"; then
@@ -195,6 +196,7 @@ create_api_token_secret() {
 }
 
 create_bucket() {
+    GCS_BUCKET_NAME="${GCS_BUCKET_NAME}-${PROJECT_NUMBER}"
     print_message "yellow" "\n--- Managing GCS Bucket ($GCS_BUCKET_NAME) ---"
     if ! gsutil ls -b "gs://$GCS_BUCKET_NAME" &>/dev/null; then
         print_message "yellow" "Creating GCS bucket gs://$GCS_BUCKET_NAME in $REGION..."
