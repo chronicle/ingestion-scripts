@@ -124,7 +124,7 @@ Create a zip file of the cloud function with the contents of the following files
           `gcloud functions deploy CLOUD_FUNCTION_NAME --set-env-vars ENV_NAME1=ENV_VALUE1,ENV_NAME2=ENV_VALUE2,ENV_NAME3=  --gen2 --runtime=python311 --region=us-central1 --source=SOURCE_OF_FUNCTION  --entry-point=main --service-account=SERVICE_ACCOUNT_EMAIL --trigger-http --no-allow-unauthenticated --memory=8GiB --vpc-connector=VPC_NAME --egress-settings=private-ranges-only --timeout=3600s`
 
       - **CLOUD_FUNCTION_NAME**: Unique name of the cloud function.
-      - **SOURCE_OF_FUNCTION**: Cloud Storage URI of the cloud function zip in cloud storage. (e.g. gs://teamcymru_scout/function.zip) where the teamcymru_scout is the name of the created bucket and function.zip is the cloud function zip file.
+      - **SOURCE_OF_FUNCTION**: GCloud Storage URI of the cloud function zip in cloud storage. (e.g. gs://teamcymru_scout/function.zip) where the teamcymru_scout is the name of the created bucket and function.zip is the cloud function zip file.
       - **SERVICE_ACCOUNT_EMAIL**: Email of the created service account of the project.
       - **VPC_NAME**: Name of the created VPC Network.
       - **ENV_NAME1**=**ENV_VALUE1**: Name and value of the environment variable to be created. For optional environment variables, provide **ENV_NAME=**
