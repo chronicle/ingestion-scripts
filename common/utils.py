@@ -52,7 +52,7 @@ def get_env_var(
   if is_secret:
     return get_value_from_secret_manager(os.environ[name])
   if name not in os.environ or (name in os.environ and
-                                not os.environ[name].strip()):
+                                not os.environ.get(name, "").strip()):
     return default
   return os.environ[name]
 
