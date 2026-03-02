@@ -242,7 +242,7 @@ gcloud functions deploy CLOUD_FUNCTION_NAME --set-env-vars “ENV_NAME1=ENV_VALU
 
 * **CLOUD_FUNCTION_NAME**: Unique name of the cloud function.
 * **REGION**: A region for your cloud function. (Ex : us-central1, us-west1, etc.)
-* **SOURCE_OF_FUNCTION**: gsutil URI of the cloud function zip in cloud storage.
+* **SOURCE_OF_FUNCTION**: gcloud storage URI of the cloud function zip in cloud storage.
 (e.g: gs://gti_test_bucket/gti_test.zip) where the gti_test_bucket is the name
 of the created bucket and gti_test.zip is the cloud function zip file.
 * **SERVICE_ACCOUNT_EMAIL**: Email of the created service account of the project. Make sure the selected Service account must have an required Permission. Update Service Account Permission [following these steps](#update-service-account-permission).
