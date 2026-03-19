@@ -198,9 +198,9 @@ create_api_token_secret() {
 create_bucket() {
     GCS_BUCKET_NAME="${GCS_BUCKET_NAME}-${PROJECT_NUMBER}"
     print_message "yellow" "\n--- Managing GCS Bucket ($GCS_BUCKET_NAME) ---"
-    if ! gsutil ls -b "gs://$GCS_BUCKET_NAME" &>/dev/null; then
+    if ! gcloud storage ls --b "gs://$GCS_BUCKET_NAME" &>/dev/null; then
         print_message "yellow" "Creating GCS bucket gs://$GCS_BUCKET_NAME in $REGION..."
-        gsutil mb -p "$PROJECT_ID" -l "$REGION" "gs://$GCS_BUCKET_NAME"
+        gcloud storage buckets create "gs://$GCS_BUCKET_NAME" --project="$PROJECT_ID" --location="$REGION"
         check_error "Creating GCS bucket gs://$GCS_BUCKET_NAME"
     else
         print_message "green" "Bucket gs://$GCS_BUCKET_NAME already exists."
@@ -211,7 +211,7 @@ upload_cf_zip() {
     print_message "yellow" "\n--- Uploading Cloud Function ZIP file ---"
     local GCS_URI="gs://$GCS_BUCKET_NAME/$CF_ZIP_FILE"
     print_message "yellow" "Uploading $LOCAL_ZIP_PATH to $GCS_URI"
-    gsutil cp "$LOCAL_ZIP_PATH" "$GCS_URI"
+    gcloud storage cp "$LOCAL_ZIP_PATH" "$GCS_URI"
     check_error "Uploading $LOCAL_ZIP_PATH to $GCS_URI"
 }
 
