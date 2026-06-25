@@ -301,6 +301,19 @@ gcloud scheduler jobs create http funcusingcmdschedular --schedule="*/60 * * * *
   4. Chronicle API Editor
 5. Click **Save**.
 
+### Dashboard Configuration
+
+#### Import GTI Dashboard into Google SecOps SIEM
+
+Complete the following steps to import a dashboard:
+
+1. Log in to your Google SecOps instance.
+2. In the navigation bar, click Dashboards.
+3. Click New dashboard and then select Import from JSON.
+4. The required Dashboard JSON file is hosted on [GitHub](https://github.com/VirusTotal/gti-google-secops-siem).
+5. Select a file and click Confirm. The Import dashboard confirmation dialog appears.
+6. Click Import to continue importing the dashboard to a personal or shared dashboard.
+
 ### Limitations
 
 * We suggest using the second generation of Cloud Function. The first generation of Cloud Function has a maximum execution time of 9 minutes and the second generation of Cloud Function has a maximum execution time of 60 minutes. If the execution time of the Cloud Function exceeds timeout then there are chances that the complete data won’t be ingested in the Google SecOps.
