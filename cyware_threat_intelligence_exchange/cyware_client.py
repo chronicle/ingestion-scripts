@@ -103,7 +103,7 @@ def get_start_time(lookback_days: str | None = None) -> int:
   )
   start_time = datetime.datetime.now(
       datetime.timezone.utc
-  ) - datetime.timedelta(days=default_days)
+  ) - datetime.timedelta(days=default_days)  # pyrefly: ignore[bad-argument-type]
   epoch_time = int(start_time.timestamp())
   start_time_str = start_time.strftime(constant.TIMESTAMP_PATTERN)
   utils.cloud_logging(
@@ -466,17 +466,17 @@ class CTIXClient:
     """
     last_from_timestamp = utility.get_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_FROM_TIMESTAMP,
     )
     last_to_timestamp = utility.get_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_TO_TIMESTAMP,
     )
     last_page_number = utility.get_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_PAGE_NUMBER,
     )
 
@@ -535,7 +535,7 @@ class CTIXClient:
           to_timestamp = current_time
           utility.set_last_checkpoint(
               self.tenant_name,
-              self.bucket_name,
+              self.bucket_name,  # pyrefly: ignore[bad-argument-type]
               constant.CHECKPOINT_KEY_TO_TIMESTAMP,
               None,
           )
@@ -550,7 +550,7 @@ class CTIXClient:
           to_timestamp = current_time
           utility.set_last_checkpoint(
               self.tenant_name,
-              self.bucket_name,
+              self.bucket_name,  # pyrefly: ignore[bad-argument-type]
               constant.CHECKPOINT_KEY_TO_TIMESTAMP,
               None,
           )
@@ -572,7 +572,7 @@ class CTIXClient:
         to_timestamp = current_time
         utility.set_last_checkpoint(
             self.tenant_name,
-            self.bucket_name,
+            self.bucket_name,  # pyrefly: ignore[bad-argument-type]
             constant.CHECKPOINT_KEY_TO_TIMESTAMP,
             None,
         )
@@ -590,7 +590,7 @@ class CTIXClient:
       to_timestamp = current_time
       utility.set_last_checkpoint(
           self.tenant_name,
-          self.bucket_name,
+          self.bucket_name,  # pyrefly: ignore[bad-argument-type]
           constant.CHECKPOINT_KEY_TO_TIMESTAMP,
           None,
       )
@@ -700,7 +700,7 @@ class CTIXClient:
 
     last_run_initiation_time = utility.get_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_LAST_RUN_INITIATION_TIME,
     )
 
@@ -895,7 +895,7 @@ class CTIXClient:
       if checkpoint_value and checkpoint_value > 0:
         utility.set_last_checkpoint(
             self.tenant_name,
-            self.bucket_name,
+            self.bucket_name,  # pyrefly: ignore[bad-argument-type]
             constant.CHECKPOINT_KEY_CTIX_MODIFIED,
             checkpoint_value,
         )
@@ -972,14 +972,14 @@ class CTIXClient:
 
     checkpoints = {
         key: utility.get_last_checkpoint(
-            self.tenant_name, self.bucket_name, key
+            self.tenant_name, self.bucket_name, key  # pyrefly: ignore[bad-argument-type]
         )
         for key in checkpoint_keys
     }
 
     if all(checkpoints.values()):
       last_ctix_modified_int = int(
-          checkpoints[constant.CHECKPOINT_KEY_CTIX_MODIFIED]
+          checkpoints[constant.CHECKPOINT_KEY_CTIX_MODIFIED]  # pyrefly: ignore[bad-argument-type]
       )
       checkpoint_filtered = [
           ind
@@ -1060,7 +1060,7 @@ class CTIXClient:
       batch_count = self._process_enrichment_chunk(
           batch_idx,
           indicator_batch,
-          checkpoint_value,
+          checkpoint_value,  # pyrefly: ignore[bad-argument-type]
           from_timestamp,
           to_timestamp,
           page,
@@ -1097,19 +1097,19 @@ class CTIXClient:
     )
     utility.set_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_FROM_TIMESTAMP,
         from_timestamp,
     )
     utility.set_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_TO_TIMESTAMP,
         to_timestamp,
     )
     utility.set_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_PAGE_NUMBER,
         page,
     )
@@ -1161,12 +1161,12 @@ class CTIXClient:
 
     saved_label_list = utility.get_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_LABEL_LIST,
     )
     saved_current_label = utility.get_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_CURRENT_LABEL,
     )
 
@@ -1227,7 +1227,7 @@ class CTIXClient:
     )
     utility.set_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_LABEL_LIST,
         current_label_list,
     )
@@ -1243,7 +1243,7 @@ class CTIXClient:
 
       utility.set_last_checkpoint(
           self.tenant_name,
-          self.bucket_name,
+          self.bucket_name,  # pyrefly: ignore[bad-argument-type]
           constant.CHECKPOINT_KEY_CURRENT_LABEL,
           label,
       )
@@ -1285,7 +1285,7 @@ class CTIXClient:
 
     utility.set_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_FROM_TIMESTAMP,
         to_timestamp,
     )
@@ -1293,7 +1293,7 @@ class CTIXClient:
         constant.CHECKPOINT_KEY_TO_TIMESTAMP,
         "to_timestamp",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
     utils.cloud_logging(
         "Updated from_timestamp to %s for next run. Cleared "
@@ -1305,7 +1305,7 @@ class CTIXClient:
         constant.CHECKPOINT_KEY_CURRENT_LABEL,
         "current_label",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
     utils.cloud_logging(
         "All labels processed successfully. Cleared label checkpoints.",
@@ -1318,37 +1318,37 @@ class CTIXClient:
         constant.CHECKPOINT_KEY_LABEL_LIST,
         "label_list",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
     utility.clear_checkpoint_if_exists(
         constant.CHECKPOINT_KEY_CURRENT_LABEL,
         "current_label",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
     utility.clear_checkpoint_if_exists(
         constant.CHECKPOINT_KEY_FROM_TIMESTAMP,
         "from_timestamp",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
     utility.clear_checkpoint_if_exists(
         constant.CHECKPOINT_KEY_TO_TIMESTAMP,
         "to_timestamp",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
     utility.clear_checkpoint_if_exists(
         constant.CHECKPOINT_KEY_CTIX_MODIFIED,
         "ctix_modified",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
     utility.clear_checkpoint_if_exists(
         constant.CHECKPOINT_KEY_PAGE_NUMBER,
         "page_number",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
 
   def fetch_indicator_data(
@@ -1372,7 +1372,7 @@ class CTIXClient:
 
     last_page_number = utility.get_last_checkpoint(
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         constant.CHECKPOINT_KEY_PAGE_NUMBER,
     )
     if last_page_number:
@@ -1429,11 +1429,11 @@ class CTIXClient:
             constant.CHECKPOINT_KEY_CTIX_MODIFIED,
             "ctix_modified",
             self.tenant_name,
-            self.bucket_name,
+            self.bucket_name,  # pyrefly: ignore[bad-argument-type]
         )
         utility.set_last_checkpoint(
             self.tenant_name,
-            self.bucket_name,
+            self.bucket_name,  # pyrefly: ignore[bad-argument-type]
             constant.CHECKPOINT_KEY_PAGE_NUMBER,
             page,
         )
@@ -1470,7 +1470,7 @@ class CTIXClient:
         constant.CHECKPOINT_KEY_PAGE_NUMBER,
         "page_number",
         self.tenant_name,
-        self.bucket_name,
+        self.bucket_name,  # pyrefly: ignore[bad-argument-type]
     )
 
     utils.cloud_logging(

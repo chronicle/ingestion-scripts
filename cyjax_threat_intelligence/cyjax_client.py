@@ -80,7 +80,7 @@ class CyjaxClient:
     try:
       json_data = response.json()
       if isinstance(json_data, dict):
-        return json_data.get("message", response.text)
+        return json_data.get("message", response.text)  # pyrefly: ignore[bad-return]
       return response.text
     except (ValueError, json.decoder.JSONDecodeError):
       return response.text

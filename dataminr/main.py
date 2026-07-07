@@ -116,9 +116,9 @@ def get_alert_parameters(watch_list_objects: Dict[str, Any]) -> Dict[str, Any]:
           f"Skipping data collection for {all_absent_watch_list} as the"
           " watchlist was not found on Dataminr"
       )
-    alert_parameters["lists"] = ",".join(present_watch_list_ids)
+    alert_parameters["lists"] = ",".join(present_watch_list_ids)  # pyrefly: ignore[bad-assignment]
   else:
-    alert_parameters["lists"] = ",".join(watch_list_all_objects_dict.values())
+    alert_parameters["lists"] = ",".join(watch_list_all_objects_dict.values())  # pyrefly: ignore[bad-assignment]
   return alert_parameters
 
 

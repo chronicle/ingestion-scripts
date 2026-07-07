@@ -690,7 +690,7 @@ class VectraClient:
 
       # finalize the ERRORS passing
       response = self._make_api_call(
-          constant.VECTRA_DETECTION_ENDPOINT, query_params
+          constant.VECTRA_DETECTION_ENDPOINT, query_params  # pyrefly: ignore[bad-argument-type]
       )
       return response
     except Exception as e:
@@ -746,7 +746,7 @@ class VectraClient:
           "limit": constant.MAX_EVENT_LIMIT,
       }
       response = self._make_api_call(
-          constant.VECTRA_AUDIT_ENDPOINT, query_params
+          constant.VECTRA_AUDIT_ENDPOINT, query_params  # pyrefly: ignore[bad-argument-type]
       )
       return response
     except Exception as e:
@@ -846,7 +846,7 @@ class VectraClient:
 
       # finalize the ERRORS passing
       response = self._make_api_call(
-          constant.VECTRA_SCORING_ENDPOINT, query_params
+          constant.VECTRA_SCORING_ENDPOINT, query_params  # pyrefly: ignore[bad-argument-type]
       )
       return response
     except Exception as e:

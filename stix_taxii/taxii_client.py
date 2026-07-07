@@ -172,12 +172,12 @@ class TAXIIClient:
 
       # Create a list of collection names from the CSV string provided in
       # TAXII_COLLECTION_NAMES environment variable.
-      self.collection_names = [
+      self.collection_names = [  # pyrefly: ignore[bad-assignment]
           name.strip() for name in self.collection_names.split(",")
       ]
 
       # Filter out any empty strings from the collection names list.
-      self.collection_names = list(filter(lambda x: x, self.collection_names))
+      self.collection_names = list(filter(lambda x: x, self.collection_names))  # pyrefly: ignore[bad-assignment]
 
       # Verify whether collection names provided by the user exists on the
       # server. If not, then raise an error.
@@ -194,7 +194,7 @@ class TAXIIClient:
       # Meaning, the indicators will be fetched from all available collections.
       print("As no collection names are provided,"
             " objects will be fetched from all available collections.")
-      self.collection_names = available_collections
+      self.collection_names = available_collections  # pyrefly: ignore[bad-assignment]
 
     print("Indicators will be fetched from TAXII collections: ",
           f"{', '.join(self.collection_names)}.")

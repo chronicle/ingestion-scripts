@@ -51,22 +51,22 @@ def build_and_ingest_payload(log: Union[Dict[Any, Any], List[Any]]) -> str:
   if PAYLOAD_SIZE == 0:
     # Build a new object.
     PAYLOAD = []
-    log = json.dumps(log)
+    log = json.dumps(log)  # pyrefly: ignore[bad-assignment]
     PAYLOAD.append(log)
     PAYLOAD_SIZE = PAYLOAD_SIZE + (sys.getsizeof(json.dumps(PAYLOAD)))
   else:
-    log = json.dumps(log)
+    log = json.dumps(log)  # pyrefly: ignore[bad-assignment]
     logsize = sys.getsizeof(log)
     # Send when the payload hits a certain size.
-    if PAYLOAD_SIZE + logsize > PAYLOAD_THRESHOLD:
+    if PAYLOAD_SIZE + logsize > PAYLOAD_THRESHOLD:  # pyrefly: ignore[unsupported-operation]
       # Ingest collected payload data.
-      ingest.ingest(PAYLOAD, CHRONICLE_DATA_TYPE)
+      ingest.ingest(PAYLOAD, CHRONICLE_DATA_TYPE)  # pyrefly: ignore[bad-argument-type]
       # Reset payload.
       PAYLOAD_SIZE = 0
       PAYLOAD = []
     # Append the event.
-    PAYLOAD.append(log)
-    PAYLOAD_SIZE = PAYLOAD_SIZE + (sys.getsizeof(log))
+    PAYLOAD.append(log)  # pyrefly: ignore[missing-attribute]
+    PAYLOAD_SIZE = PAYLOAD_SIZE + (sys.getsizeof(log))  # pyrefly: ignore[unsupported-operation]
 
   return "OK"
 
@@ -96,7 +96,7 @@ def main(req):  # pylint: disable=unused-argument
     print("Did not get configuration parameters from request body.")
 
   subscriber = pubsub_v1.SubscriberClient()
-  subscription_path = subscriber.subscription_path(project_id, subscription_id)
+  subscription_path = subscriber.subscription_path(project_id, subscription_id)  # pyrefly: ignore[unbound-name]
 
   def get_and_ingest_messages(
       message: pubsub_v1.subscriber.message.Message) -> None:
@@ -131,6 +131,6 @@ def main(req):  # pylint: disable=unused-argument
       future.result()  # Block until the shutdown is complete.
 
   if PAYLOAD_SIZE > 0:
-    ingest.ingest(PAYLOAD, CHRONICLE_DATA_TYPE)
+    ingest.ingest(PAYLOAD, CHRONICLE_DATA_TYPE)  # pyrefly: ignore[bad-argument-type]
 
   return "Ingestion completed."

@@ -125,7 +125,7 @@ def get_and_ingest_users(session: auth.UsernamePasswordAuth, server_url: str,
 
     # Retrieve the json response and calculate number of users as log count.
     try:
-      json_response = response.json()
+      json_response = response.json()  # pyrefly: ignore[unbound-name]
     except (ValueError, TypeError) as error:
       raise RuntimeError(
           "Unexpected data format received while collecting users from Proofpoint."

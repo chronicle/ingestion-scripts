@@ -107,7 +107,7 @@ def main(request):  # pylint: disable=unused-argument
         enrichment_enabled=enrichment_enabled,
         label_name=label_name,
         bucket_name=bucket_name,
-        lookback_days=lookback_days,
+        lookback_days=lookback_days,  # pyrefly: ignore[bad-argument-type]
     )
 
     try:
