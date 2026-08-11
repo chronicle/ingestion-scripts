@@ -101,7 +101,8 @@ def get_value_from_secret_manager(resource_path: str) -> str:
   client = secretmanager.SecretManagerServiceClient()
 
   # Access the secret version.
-  response = client.access_secret_version(name=resource_path)
+  secret_name = os.environ['CHRONICLE_SERVICE_ACCOUNT']
+  response = client.access_secret_version(request={"name": secret_name})
   return response.payload.data.decode("UTF-8")
 
 
