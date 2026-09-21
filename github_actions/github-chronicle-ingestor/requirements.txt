@@ -1,0 +1,2 @@
+requests
+google-auth>=2.0.0
