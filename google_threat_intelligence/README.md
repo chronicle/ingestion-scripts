@@ -119,9 +119,13 @@ Cloud Scheduler jobs, and Secret Manager secrets.
       - Cloud Function Name
       - Cloud Scheduler Job Name
       - Chronicle Customer ID
+      - Chronicle Region
       - GTI API Token Value (this will be stored securely in Secret Manager)
       - Other optional environment variables.
     - Provide the requested information at each prompt. Required fields must be filled. Optional fields can be left blank to use defaults where applicable.
+    - **Note:** GCP Region and Chronicle Region are not the same value:
+      - **GCP Region** is where the Cloud Function itself is deployed. Any supported [Cloud Functions region](https://cloud.google.com/run/docs/locations) works (e.g. `us-central1`, `europe-west1`).
+      - **Chronicle Region** is your Google SecOps instance's [data residency region](https://cloud.google.com/terms/secops/data-residency?hl=en), found in the SecOps instance under **Settings > SIEM Settings > Profile** (defaults to `us`).
 
 9. **Monitor the Output**:
     - The script will display progress messages, indicating which steps are being performed (e.g., enabling APIs, creating resources, deploying the function).
@@ -153,7 +157,7 @@ Ensure the following Google APIs are enabled in your GCP project (via **APIs & S
 | --- | --- | --- | --- | --- | --- |
 | CHRONICLE_CUSTOMER_ID | Google SecOps customer id. Navigate to settings in the Google SecOps console for the customer id. | Yes | string| -  | No |
 | CHRONICLE_SERVICE_ACCOUNT | Copied resource name value of service account secret from the secret manager. Required if you are opting for a custom service account authentication option. | No | string| -  | Yes|
-| CHRONICLE_REGION | A region where the Google SecOps instance is located. | No | string | us | No |
+| CHRONICLE_REGION | The Google SecOps (Chronicle) region where your SecOps instance is located. **This is independent from the GCP region used to deploy the Cloud Function** - it must match your SecOps tenant's region, not your deployment region. Find your tenant's region in the SecOps console under **Settings > SIEM Settings > Profile**. (e.g. `us`, `europe`, `europe-west2`, `asia-southeast1`, `me-central2`). | No | string | us | No |
 | CHRONICLE_PROJECT_NUMBER | Specifies the GCP project identifier associated with your Chronicle environment. | Yes | Number | - | No |
 | GCP_BUCKET_NAME |  Name of the created GCP bucket. | Yes | string| -  | No |
 | GTI_API_TOKEN | Copied resource name value of API Token of Google Threat Intelligence Account from secret manager.<br> Generate an API token from the VirusTotal platform's API key section. | Yes | string | - | Yes |
@@ -241,7 +245,7 @@ gcloud functions deploy CLOUD_FUNCTION_NAME --set-env-vars “ENV_NAME1=ENV_VALU
 ```
 
 * **CLOUD_FUNCTION_NAME**: Unique name of the cloud function.
-* **REGION**: A region for your cloud function. (Ex : us-central1, us-west1, etc.)
+* **REGION**: The Google Cloud region where this cloud function will be deployed. (Ex : us-central1, us-west1, etc.)
 * **SOURCE_OF_FUNCTION**: gcloud storage URI of the cloud function zip in
 cloud storage.
 (e.g: gs://gti_test_bucket/gti_test.zip) where the gti_test_bucket is the name

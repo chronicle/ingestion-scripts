@@ -55,6 +55,9 @@ prompt_for_input() {
     read -r -p "Enter your GCP Project ID (e.g., my-project-12345): " PROJECT_ID
     [[ -z "$PROJECT_ID" ]] && { print_message "red" "ERROR: Project ID cannot be empty."; exit 1; }
 
+    print_message "yellow" "\nGCP Region: the Google Cloud region where this cloud function will be deployed."
+    print_message "yellow" "  - This is independent of your Chronicle/SecOps instance region."
+    print_message "yellow" "  - Any supported Cloud Functions region works. Full list: https://cloud.google.com/run/docs/locations"
     read -r -p "Enter your GCP Region (e.g., us-central1): " REGION
     [[ -z "$REGION" ]] && { print_message "red" "ERROR: Region cannot be empty."; exit 1; }
 
@@ -67,6 +70,9 @@ prompt_for_input() {
     read -r -p "Enter Chronicle Customer ID: " CHRONICLE_CUSTOMER_ID
     [[ -z "$CHRONICLE_CUSTOMER_ID" ]] && { print_message "red" "ERROR: Chronicle Customer ID cannot be empty."; exit 1; }
 
+    print_message "yellow" "\nCHRONICLE_REGION: the Google SecOps (Chronicle) data residency region where your SecOps instance/tenant actually lives."
+    print_message "yellow" "  - This is different from GCP Region above."
+    print_message "yellow" "  - To find your SecOps instance's region: go to Settings > SIEM Settings > Profile (look for 'Region')."
     local default_chronicle_region="us"
     read -r -p "Enter CHRONICLE_REGION [default: $default_chronicle_region]: " temp_var
     CHRONICLE_REGION=${temp_var:-$default_chronicle_region}
