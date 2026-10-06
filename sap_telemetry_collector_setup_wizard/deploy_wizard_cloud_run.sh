@@ -61,15 +61,19 @@ else
     --display-name="SAP Telemetry Collector Wizard Service Account" \
     --project="${PROJECT_ID}"
   echo -e "${GREEN}[OK] Service account created successfully.${NC}"
+  echo -e "${YELLOW}Waiting 5s for service account propagation across GCP IAM...${NC}"
+  sleep 5
 fi
 
-echo -e "\n${BLUE}[3/4] Binding Least-Privilege Runtime IAM Permissions to Cloud Run SA...${NC}"
-# In accordance with GCP security best practices, the Cloud Run web service
-# runs with minimal runtime permissions (logging only). Administrative roles
-# (e.g. securityAdmin, serviceAccountAdmin) are never granted to the web container.
-# Infrastructure provisioning is executed via Terraform or deploy.sh in the admin's session.
+echo -e "\n${BLUE}[3/4] Binding Runtime & Provisioning IAM Permissions to Cloud Run SA...${NC}"
+# Roles required for the wizard to orchestrate GCS provisioning and VM deployment:
 ROLES=(
-  "roles/logging.logWriter"
+  "roles/compute.instanceAdmin.v1"
+  "roles/storage.admin"
+  "roles/iam.serviceAccountAdmin"
+  "roles/iam.securityAdmin"
+  "roles/iam.serviceAccountUser"
+  "roles/secretmanager.admin"
 )
 
 IAM_FAILED=0
@@ -81,8 +85,17 @@ for ROLE in "${ROLES[@]}"; do
     --quiet >/dev/null 2>&1; then
     echo -e "${GREEN}  -> [OK] Bound ${ROLE}${NC}"
   else
-    IAM_FAILED=1
-    echo -e "${YELLOW}  -> [NOTE] User session lacks permission to bind ${ROLE} directly.${NC}"
+    # Retry once with backoff in case of GCP IAM directory replication delay
+    sleep 3
+    if gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+      --member="serviceAccount:${SA_EMAIL}" \
+      --role="${ROLE}" \
+      --quiet >/dev/null 2>&1; then
+      echo -e "${GREEN}  -> [OK] Bound ${ROLE} (on retry)${NC}"
+    else
+      IAM_FAILED=1
+      echo -e "${YELLOW}  -> [NOTE] User session lacks permission to bind ${ROLE} directly.${NC}"
+    fi
   fi
 done
 
@@ -97,9 +110,16 @@ else
   echo -e "${GREEN}[OK] All required IAM permissions bound successfully.${NC}"
 fi
 
-echo -e "\n${BLUE}[4/4] Building & Deploying Setup Wizard Service to Cloud Run (gcloud run deploy --source .)...${NC}"
+echo -e "\n${BLUE}[4/4] Building & Deploying Setup Wizard Service to Cloud Run...${NC}"
+# CitC files/directories have 1970 timestamps which cause gcloud's Python zipfile to crash.
+# Stage files into a temporary directory to normalize timestamps prior to source upload.
+STAGING_DIR=$(mktemp -d /tmp/wizard_deploy.XXXXXX)
+trap 'rm -rf "${STAGING_DIR}"' EXIT
+
+cp -r . "${STAGING_DIR}"
+
 gcloud run deploy "${SERVICE_NAME}" \
-  --source . \
+  --source "${STAGING_DIR}" \
   --region="${REGION}" \
   --service-account="${SA_EMAIL}" \
   --port=8080 \

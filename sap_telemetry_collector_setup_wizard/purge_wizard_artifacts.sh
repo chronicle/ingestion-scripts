@@ -110,6 +110,7 @@ ROLES=(
   "roles/iam.serviceAccountAdmin"
   "roles/iam.securityAdmin"
   "roles/iam.serviceAccountUser"
+  "roles/secretmanager.admin"
   "roles/logging.logWriter"
 )
 
