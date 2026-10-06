@@ -80,10 +80,13 @@ function normalizeDuration(val: string | undefined | null, defaultVal = '600s'):
 /** Serializes and normalizes the CollectorConfigJSON object into formatted JSON. */
 export function formatCollectorConfigJson(collector: CollectorConfigJSON): string {
   const rawPort = collector?.bindplanePort;
-  let portStr = "4317";
+  let portNum = 4317;
 
   if (rawPort !== undefined && rawPort !== null && String(rawPort).trim() !== '') {
-    portStr = String(rawPort).trim();
+    const parsed = Number(String(rawPort).trim());
+    if (Number.isInteger(parsed) && parsed > 0) {
+      portNum = parsed;
+    }
   }
 
   const normalizedSystems = (collector?.systems || []).map(sys => ({
@@ -97,7 +100,7 @@ export function formatCollectorConfigJson(collector: CollectorConfigJSON): strin
 
   const normalizedCollector = {
     ...collector,
-    bindplanePort: portStr,
+    bindplanePort: portNum,
     systems: normalizedSystems
   };
 

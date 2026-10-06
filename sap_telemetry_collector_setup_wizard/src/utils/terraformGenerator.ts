@@ -1,9 +1,10 @@
 import {AppState} from '../types';
 
-/** Generates the main.tf Terraform file defining GCS, GCE, and IAM resources. */
+/**
+ * Generates the main.tf Terraform file defining the GCE VM instance with the
+ * telemetry collector startup script.
+ */
 export function generateMainTf(state: AppState): string {
-  const { gcs, gce, bindplane, docker } = state;
-
   return `# ==============================================================================
 # Terraform configuration for Google Cloud SAP Telemetry Collector & BindPlane Agent
 # Ingesting SAP Application Logs into SecOps / Chronicle
@@ -26,79 +27,7 @@ provider "google" {
 }
 
 # ------------------------------------------------------------------------------
-# 1. Google Cloud Storage Bucket for Telemetry Collector Configuration
-# ------------------------------------------------------------------------------
-resource "google_storage_bucket" "collector_config_bucket" {
-  name                        = var.bucket_name
-  location                    = var.region
-  storage_class               = "${gcs.storageClass}"
-  force_destroy               = false
-  uniform_bucket_level_access = ${gcs.uniformBucketLevelAccess}
-
-  versioning {
-    enabled = ${gcs.enableVersioning}
-  }
-
-  labels = {
-    environment = "secops-telemetry"
-    managed_by  = "sap-telemetry-wizard"
-  }
-}
-
-resource "google_storage_bucket_object" "folder_config" {
-  name    = "config/"
-  content = " "
-  bucket  = google_storage_bucket.collector_config_bucket.name
-}
-
-resource "google_storage_bucket_object" "folder_jco" {
-  name    = "jco/"
-  content = " "
-  bucket  = google_storage_bucket.collector_config_bucket.name
-}
-
-resource "google_storage_bucket_object" "folder_state" {
-  name    = "state/"
-  content = " "
-  bucket  = google_storage_bucket.collector_config_bucket.name
-}
-
-resource "google_storage_bucket_object" "collector_json" {
-  name   = "config/collector_config.json"
-  bucket = google_storage_bucket.collector_config_bucket.name
-  content = jsonencode(${JSON.stringify(state.collector, null, 2)})
-  content_type = "application/json"
-}
-
-# ------------------------------------------------------------------------------
-# 2. Service Account & IAM Roles for Telemetry Collector GCE Instance
-# ------------------------------------------------------------------------------
-resource "google_service_account" "collector_sa" {
-  account_id   = "sap-telemetry-collector-sa"
-  display_name = "SAP Telemetry Collector Service Account"
-  project      = var.project_id
-}
-
-resource "google_storage_bucket_iam_member" "gcs_reader" {
-  bucket = google_storage_bucket.collector_config_bucket.name
-  role   = "roles/storage.objectViewer"
-  member = "serviceAccount:\${google_service_account.collector_sa.email}"
-}
-
-resource "google_project_iam_member" "secret_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:\${google_service_account.collector_sa.email}"
-}
-
-resource "google_project_iam_member" "metric_writer" {
-  project = var.project_id
-  role    = "roles/monitoring.metricWriter"
-  member  = "serviceAccount:\${google_service_account.collector_sa.email}"
-}
-
-# ------------------------------------------------------------------------------
-# 3. Google Compute Engine (GCE) Instance with Startup Script
+# Google Compute Engine (GCE) Instance with Startup Script
 # ------------------------------------------------------------------------------
 resource "google_compute_instance" "collector_vm" {
   name         = var.vm_name
@@ -106,126 +35,179 @@ resource "google_compute_instance" "collector_vm" {
   zone         = var.zone
   project      = var.project_id
 
-  tags = ${JSON.stringify(gce.tags)}
+  tags = var.tags
 
   boot_disk {
     initialize_params {
-      image = "${gce.imageProject}/${gce.imageFamily}"
-      size  = ${gce.diskSizeGb}
+      image = "\${var.image_project}/\${var.image_family}"
+      size  = var.disk_size_gb
       type  = "pd-balanced"
     }
   }
 
   network_interface {
     network    = var.network
-    subnetwork = var.subnetwork
+    subnetwork = var.subnetwork != "" ? var.subnetwork : null
 
-    ${gce.enableExternalIP ? `access_config {
-      // Ephemeral public IP assigned
-    }` : '// Private IP only'}
+    dynamic "access_config" {
+      for_each = var.enable_external_ip ? [1] : []
+      content {
+        // Ephemeral public IP assigned
+      }
+    }
   }
 
   service_account {
-    email  = google_service_account.collector_sa.email
-    scopes = ["cloud-platform"]
+    email  = var.service_account
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
   }
 
   metadata = {
-    startup-script = templatefile("\${path.module}/startup.sh", {
-      BINDPLANE_SERVER_URL = "${bindplane.serverUrl}"
-      BINDPLANE_SECRET     = "${bindplane.secretKey}"
-      BINDPLANE_VERSION    = "${bindplane.agentVersion}"
-      BINDPLANE_LABELS     = "${bindplane.labels}"
-      COLLECTOR_GCS_PATH   = "gs://\${google_storage_bucket.collector_config_bucket.name}/${gcs.subfolderPath}/collector_config.json"
-      DOCKER_IMAGE         = "${docker.dockerImage}"
-      CONTAINER_NAME       = "${docker.containerName}"
-    })
+    startup-script = file("\${path.module}/startup.sh")
   }
-
-  depends_on = [
-    google_storage_bucket_object.collector_json
-  ]
 }
 
 # ------------------------------------------------------------------------------
 # Outputs
 # ------------------------------------------------------------------------------
 output "instance_name" {
-  value = google_compute_instance.collector_vm.name
+  description = "The name of the GCE VM instance"
+  value       = google_compute_instance.collector_vm.name
 }
 
 output "instance_ip" {
-  value = ${gce.enableExternalIP ? 'google_compute_instance.collector_vm.network_interface[0].access_config[0].nat_ip' : 'google_compute_instance.collector_vm.network_interface[0].network_ip'}
+  description = "The IP address of the GCE VM instance"
+  value       = try(google_compute_instance.collector_vm.network_interface[0].access_config[0].nat_ip, google_compute_instance.collector_vm.network_interface[0].network_ip)
 }
 
-output "config_gcs_uri" {
-  value = "gs://\${google_storage_bucket.collector_config_bucket.name}/${gcs.subfolderPath}/collector_config.json"
+output "service_account_email" {
+  description = "The service account email attached to the GCE VM instance"
+  value       = google_compute_instance.collector_vm.service_account[0].email
 }
 `;
 }
 
 /** Generates variables.tf declaring input variables for the Terraform configuration. */
 export function generateVariablesTf(state: AppState): string {
+  const projectId = state.gce.projectId || state.gcs.projectId || '';
+  const zone = state.gce.zone || 'us-central1-a';
+  const region = state.gcs.location ||
+      (zone.includes('-') ? zone.substring(0, zone.lastIndexOf('-')) :
+                            'us-central1');
+  const serviceAccount =
+      (state.gce.serviceAccount && state.gce.serviceAccount !== 'default') ?
+      state.gce.serviceAccount :
+      (state.cloudRunServiceAccount || state.gce.serviceAccount || 'default');
+
   return `variable "project_id" {
   type        = string
   description = "Google Cloud Project ID"
-  default     = "${state.gcs.projectId}"
+  default     = "${projectId}"
 }
 
 variable "region" {
   type        = string
   description = "GCP Region"
-  default     = "${state.gcs.location}"
+  default     = "${region}"
 }
 
 variable "zone" {
   type        = string
   description = "GCP Zone"
-  default     = "${state.gce.zone}"
-}
-
-variable "bucket_name" {
-  type        = string
-  description = "GCS bucket name for storing collector JSON"
-  default     = "${state.gcs.bucketName}"
+  default     = "${zone}"
 }
 
 variable "vm_name" {
   type        = string
   description = "GCE VM instance name"
-  default     = "${state.gce.vmName}"
+  default     = "${state.gce.vmName || 'sap-telemetry-collector-vm'}"
 }
 
 variable "machine_type" {
   type        = string
   description = "Compute Instance Machine Type"
-  default     = "${state.gce.machineType}"
+  default     = "${state.gce.machineType || 'e2-standard-4'}"
 }
 
 variable "network" {
   type        = string
   description = "VPC Network name"
-  default     = "${state.gce.network}"
+  default     = "${state.gce.network || 'default'}"
 }
 
 variable "subnetwork" {
   type        = string
   description = "Subnet name"
-  default     = "${state.gce.subnetwork}"
+  default     = "${state.gce.subnetwork || 'default'}"
+}
+
+variable "disk_size_gb" {
+  type        = number
+  description = "Boot disk size in GB"
+  default     = ${state.gce.diskSizeGb || 50}
+}
+
+variable "image_project" {
+  type        = string
+  description = "OS Image Project"
+  default     = "${state.gce.imageProject || 'debian-cloud'}"
+}
+
+variable "image_family" {
+  type        = string
+  description = "OS Image Family"
+  default     = "${state.gce.imageFamily || 'debian-12'}"
+}
+
+variable "enable_external_ip" {
+  type        = bool
+  description = "Whether to assign an ephemeral external public IP to the VM"
+  default     = ${state.gce.enableExternalIP ? 'true' : 'false'}
+}
+
+variable "tags" {
+  type        = list(string)
+  description = "Network tags for the VM instance"
+  default     = ${JSON.stringify(state.gce.tags || [
+    'sap-telemetry', 'secops-collector'
+  ])}
+}
+
+variable "service_account" {
+  type        = string
+  description = "Service account email attached to the telemetry collector GCE VM"
+  default     = "${serviceAccount}"
 }
 `;
 }
 
 /** Generates terraform.tfvars containing the concrete variable values. */
 export function generateTfVars(state: AppState): string {
-  return `project_id   = "${state.gcs.projectId}"
-region       = "${state.gcs.location}"
-zone         = "${state.gce.zone}"
-bucket_name  = "${state.gcs.bucketName}"
-vm_name      = "${state.gce.vmName}"
-machine_type = "${state.gce.machineType}"
-network      = "${state.gce.network}"
-subnetwork   = "${state.gce.subnetwork}"
+  const projectId = state.gce.projectId || state.gcs.projectId || '';
+  const zone = state.gce.zone || 'us-central1-a';
+  const region = state.gcs.location ||
+      (zone.includes('-') ? zone.substring(0, zone.lastIndexOf('-')) :
+                            'us-central1');
+  const serviceAccount =
+      (state.gce.serviceAccount && state.gce.serviceAccount !== 'default') ?
+      state.gce.serviceAccount :
+      (state.cloudRunServiceAccount || state.gce.serviceAccount || 'default');
+
+  return `project_id         = "${projectId}"
+region             = "${region}"
+zone               = "${zone}"
+vm_name            = "${state.gce.vmName || 'sap-telemetry-collector-vm'}"
+machine_type       = "${state.gce.machineType || 'e2-standard-4'}"
+network            = "${state.gce.network || 'default'}"
+subnetwork         = "${state.gce.subnetwork || 'default'}"
+disk_size_gb       = ${state.gce.diskSizeGb || 50}
+image_project      = "${state.gce.imageProject || 'debian-cloud'}"
+image_family       = "${state.gce.imageFamily || 'debian-12'}"
+enable_external_ip = ${state.gce.enableExternalIP ? 'true' : 'false'}
+tags               = ${JSON.stringify(state.gce.tags || [
+    'sap-telemetry', 'secops-collector'
+  ])}
+service_account    = "${serviceAccount}"
 `;
 }
 
@@ -241,6 +223,17 @@ export function generateStartupScript(state: AppState): string {
   const hostsUpdateSection = (ip && name)
     ? `log_event "==> [Event 1/7] Updating /etc/hosts for BindPlane Server resolution (${ip} -> ${name})..."\necho "${ip} ${name}" | sudo tee -a /etc/hosts >/dev/null\nlog_event "[SUCCESS] /etc/hosts updated: ${ip} ${name}"`
     : `log_event "==> [Event 1/7] Skipping /etc/hosts update (No BindPlane Server IP / Hostname specified)..."`;
+
+  const effectiveGcsBucket =
+      (state.docker.gcsBucketPath &&
+       !state.docker.gcsBucketPath.includes('/config/')) ?
+      state.docker.gcsBucketPath :
+      `gs://${state.gcs.bucketName}`;
+  const containerName = state.docker.containerName || 'sap-telemetry-collector';
+  const dockerImage = state.docker.dockerImage ||
+      'us-docker.pkg.dev/sap-core-eng-products/sap-application-telemetry/google-cloud-sap-application-telemetry:latest';
+  const restartPolicy = state.docker.restartPolicy || 'always';
+  const networkMode = state.docker.networkMode || 'host';
 
   return `#!/bin/bash
 # ==============================================================================
@@ -298,30 +291,33 @@ else
   log_event "[ERROR] Docker daemon is not active. Check 'sudo systemctl status docker'."
 fi
 
-log_event "==> [Event 6/7] Launching Telemetry Collector Container (${state.docker.containerName})..."
-sudo docker rm -f ${state.docker.containerName} >/dev/null 2>&1 || true
+log_event "==> [Event 6/7] Launching Telemetry Collector Container (${
+      containerName})..."
+sudo docker rm -f ${containerName} >/dev/null 2>&1 || true
 
 sudo docker run -d \\
-  --name ${state.docker.containerName} \\
-  --restart always \\
-  --network host \\
-  -e COLLECTOR_GCS_BUCKET="gs://${state.gcs.bucketName}" \\
-  ${state.docker.dockerImage} >/dev/null 2>&1
+  --name ${containerName} \\
+  --restart ${restartPolicy} \\
+  --network ${networkMode} \\
+  -e COLLECTOR_GCS_BUCKET="${effectiveGcsBucket}" \\
+  ${dockerImage} >/dev/null 2>&1
 
 log_event "==> [Event 7/7] Polling Telemetry Collector Container status..."
 CONTAINER_IS_UP=false
 for i in {1..10}; do
-  CONTAINER_INFO=$(sudo docker ps --filter "name=${state.docker.containerName}" --format '{{.ID}} {{.Image}} {{.Status}}')
+  CONTAINER_INFO=$(sudo docker ps --filter "name=${
+      containerName}" --format '{{.ID}} {{.Image}} {{.Status}}')
   if echo "$CONTAINER_INFO" | grep -q "Up"; then
     CONTAINER_IS_UP=true
-    log_event "[SUCCESS] Container ${state.docker.containerName} is RUNNING: $CONTAINER_INFO"
+    log_event "[SUCCESS] Container ${containerName} is RUNNING: $CONTAINER_INFO"
     break
   fi
   sleep 3
 done
 
 if [ "$CONTAINER_IS_UP" = false ]; then
-  CONTAINER_ALL=$(sudo docker ps -a --filter "name=${state.docker.containerName}" --format '{{.ID}} {{.Image}} {{.Status}}')
+  CONTAINER_ALL=$(sudo docker ps -a --filter "name=${
+      containerName}" --format '{{.ID}} {{.Image}} {{.Status}}')
   log_event "[ERROR] Container failed to start. Current status: $CONTAINER_ALL"
 fi
 

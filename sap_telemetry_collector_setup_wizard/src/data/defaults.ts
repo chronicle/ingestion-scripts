@@ -4,7 +4,7 @@ import {AppState, WizardStepMeta} from '../types';
 export const INITIAL_APP_STATE: AppState = {
   collector: {
     bindplaneHost: "0.0.0.0",
-    bindplanePort: "4317",
+    bindplanePort: 4317,
     heartbeat_enabled: true,
     systems: [
       {
@@ -136,7 +136,7 @@ export const PRESET_LANDSCAPES = {
       ...INITIAL_APP_STATE,
       collector: {
         bindplaneHost: "0.0.0.0",
-        bindplanePort: "4317",
+        bindplanePort: 4317,
         heartbeat_enabled: true,
         systems: [
           {

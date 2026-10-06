@@ -1,36 +1,58 @@
 /**
  * Google Cloud REST API Client Helper
- * Supports explicit user-provided OAuth access tokens or local development tokens.
- * In production, infrastructure provisioning should be executed via Terraform
- * or authenticated shell scripts (deploy.sh) to adhere to least privilege and
- * avoid exposing raw service account tokens to the client browser.
+ * Implements a Backend-for-Frontend (BFF) architecture. API requests are routed
+ * through the server-side proxy (/api/gcp/storage/ and /api/gcp/compute/) which
+ * attaches the Cloud Run Service Account credentials server-side, preventing
+ * raw OAuth token exposure to client browsers.
  */
 
 import {AppState} from '../types';
 import {generateStartupScript} from './terraformGenerator';
 
 /**
- * Retrieves a valid GCP OAuth access token from explicit input or local dev server.
+ * Returns the effective API endpoint URL and headers for a GCP REST request.
+ * - If userProvidedToken is supplied, targets GCP APIs directly with the
+ * Authorization header.
+ * - Otherwise, dispatches through the server-side BFF proxy (/api/gcp/...) with
+ * zero client-side credentials.
  */
-export async function getGcpAccessToken(userProvidedToken?: string): Promise<string | null> {
-  // 1. If explicit token provided, use it
+export function resolveGcpApiTarget(
+    targetUrl: string, userProvidedToken?: string):
+    {url: string; headers: Record<string, string>} {
+  if (userProvidedToken && userProvidedToken.trim()) {
+    return {
+      url: targetUrl,
+      headers: {'Authorization': `Bearer ${userProvidedToken.trim()}`}
+    };
+  }
+
+  // Route through server-side Backend-for-Frontend (BFF) reverse proxy
+  if (targetUrl.startsWith('https://storage.googleapis.com/')) {
+    return {
+      url: targetUrl.replace(
+          'https://storage.googleapis.com/', '/api/gcp/storage/'),
+      headers: {}
+    };
+  }
+
+  if (targetUrl.startsWith('https://compute.googleapis.com/')) {
+    return {
+      url: targetUrl.replace(
+          'https://compute.googleapis.com/', '/api/gcp/compute/'),
+      headers: {}
+    };
+  }
+
+  return {url: targetUrl, headers: {}};
+}
+
+/**
+ * Retrieves a user-provided GCP OAuth access token if explicitly configured.
+ */
+export function getGcpAccessToken(userProvidedToken?: string): string | null {
   if (userProvidedToken && userProvidedToken.trim()) {
     return userProvidedToken.trim();
   }
-
-  // 2. Query local development dev-server endpoint if available (e.g. Vite dev on localhost)
-  try {
-    const res = await fetch('/api/token');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.access_token) {
-        return data.access_token;
-      }
-    }
-  } catch (err) {
-    // Endpoint not available or running in production with /api/token disabled
-  }
-
   return null;
 }
 
@@ -47,13 +69,9 @@ export async function createGcsBucketAndFolders(
   const logs: string[] = [];
   console.info(`[SAP Telemetry Wizard] Initializing GCS bucket creation for gs://${bucketName} in project ${projectId}...`);
 
-  const token = await getGcpAccessToken(userToken);
-
-  const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
-  const isDevToken = !userToken && !!token;
-
-  if (isDevToken) {
-    const msg = `[IDENTITY] Authenticated via development environment access token.`;
+  if (!userToken) {
+    const msg =
+        `[SECURITY] Dispatching GCS provisioning via server-side Backend-for-Frontend (BFF) proxy.`;
     logs.push(msg);
     console.info(`[SAP Telemetry Wizard] ${msg}`);
   }
@@ -63,23 +81,20 @@ export async function createGcsBucketAndFolders(
     logs.push(step1Msg);
     console.info(`[SAP Telemetry Wizard] ${step1Msg}`);
 
-    const bucketRes = await fetch(
-      `https://storage.googleapis.com/storage/v1/b?project=${encodeURIComponent(projectId)}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        },
-        body: JSON.stringify({
-          name: bucketName,
-          location: location || 'us-central1',
-          iamConfiguration: {
-            uniformBucketLevelAccess: { enabled: true }
-          }
-        })
-      }
-    );
+    const bucketTarget = resolveGcpApiTarget(
+        `https://storage.googleapis.com/storage/v1/b?project=${
+            encodeURIComponent(projectId)}`,
+        userToken);
+
+    const bucketRes = await fetch(bucketTarget.url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', ...bucketTarget.headers},
+      body: JSON.stringify({
+        name: bucketName,
+        location: location || 'us-central1',
+        iamConfiguration: {uniformBucketLevelAccess: {enabled: true}}
+      })
+    });
 
     if (bucketRes.ok || bucketRes.status === 409) {
       if (bucketRes.status === 409) {
@@ -87,8 +102,10 @@ export async function createGcsBucketAndFolders(
         logs.push(msg);
         console.info(`[SAP Telemetry Wizard] ${msg}`);
       } else {
-        const data = await bucketRes.json();
-        const msg = `[OK] Bucket "gs://${bucketName}" created successfully live in Google Cloud Console! (ID: ${data.id})`;
+        const data = await bucketRes.json().catch(() => ({id: bucketName}));
+        const msg = `[OK] Bucket "gs://${
+            bucketName}" created successfully live in Google Cloud Console! (ID: ${
+            data.id || bucketName})`;
         logs.push(msg);
         console.info(`[SAP Telemetry Wizard] ${msg}`);
       }
@@ -98,17 +115,17 @@ export async function createGcsBucketAndFolders(
       logs.push(step2Msg);
       console.info(`[SAP Telemetry Wizard] ${step2Msg}`);
 
-      const uploadRes = await fetch(
-        `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucketName)}/o?uploadType=media&name=config/collector_config.json`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
-          },
-          body: configJsonString
-        }
-      );
+      const uploadTarget = resolveGcpApiTarget(
+          `https://storage.googleapis.com/upload/storage/v1/b/${
+              encodeURIComponent(
+                  bucketName)}/o?uploadType=media&name=config/collector_config.json`,
+          userToken);
+
+      const uploadRes = await fetch(uploadTarget.url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', ...uploadTarget.headers},
+        body: configJsonString
+      });
 
       if (uploadRes.ok) {
         const msg = `[OK] Uploaded collector_config.json (${configJsonString.length} bytes) live into GCS!`;
@@ -121,17 +138,16 @@ export async function createGcsBucketAndFolders(
       logs.push(step3Msg);
       console.info(`[SAP Telemetry Wizard] ${step3Msg}`);
 
-      await fetch(
-        `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucketName)}/o?uploadType=media&name=jco/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain',
-            ...authHeader
-          },
-          body: ''
-        }
-      );
+      const jcoTarget = resolveGcpApiTarget(
+          `https://storage.googleapis.com/upload/storage/v1/b/${
+              encodeURIComponent(bucketName)}/o?uploadType=media&name=jco/`,
+          userToken);
+
+      await fetch(jcoTarget.url, {
+        method: 'POST',
+        headers: {'Content-Type': 'text/plain', ...jcoTarget.headers},
+        body: ''
+      });
       const jcoMsg = `[OK] Folder hierarchy gs://${bucketName}/jco/ created.`;
       logs.push(jcoMsg);
       console.info(`[SAP Telemetry Wizard] ${jcoMsg}`);
@@ -141,17 +157,16 @@ export async function createGcsBucketAndFolders(
       logs.push(step4Msg);
       console.info(`[SAP Telemetry Wizard] ${step4Msg}`);
 
-      await fetch(
-        `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucketName)}/o?uploadType=media&name=state/`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'text/plain',
-            ...authHeader
-          },
-          body: ''
-        }
-      );
+      const stateTarget = resolveGcpApiTarget(
+          `https://storage.googleapis.com/upload/storage/v1/b/${
+              encodeURIComponent(bucketName)}/o?uploadType=media&name=state/`,
+          userToken);
+
+      await fetch(stateTarget.url, {
+        method: 'POST',
+        headers: {'Content-Type': 'text/plain', ...stateTarget.headers},
+        body: ''
+      });
       const stateMsg = `[OK] Folder hierarchy gs://${bucketName}/state/ created.`;
       logs.push(stateMsg);
       console.info(`[SAP Telemetry Wizard] ${stateMsg}`);
@@ -167,12 +182,6 @@ export async function createGcsBucketAndFolders(
       const errLog = `[ERROR] GCP Storage API returned: ${msg}`;
       logs.push(errLog);
       console.error(`[SAP Telemetry Wizard ERROR] ${errLog}`);
-
-      if (!token) {
-        const note = `[NOTE] To execute live REST calls outside Cloud Run, enter a GCP Access Token or run the generated CLI commands in Cloud Shell.`;
-        logs.push(note);
-        console.warn(`[SAP Telemetry Wizard WARNING] ${note}`);
-      }
       return { success: false, logs, error: msg };
     }
   } catch (err: unknown) {
@@ -192,8 +201,13 @@ export async function createGceInstance(
   userToken?: string
 ): Promise<{ success: boolean; logs: string[]; error?: string }> {
   const logs: string[] = [];
-  const token = await getGcpAccessToken(userToken);
-  const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+  if (!userToken) {
+    const msg =
+        `[SECURITY] Dispatching Compute Engine provisioning via server-side Backend-for-Frontend (BFF) proxy.`;
+    logs.push(msg);
+    console.info(`[SAP Telemetry Wizard] ${msg}`);
+  }
 
   const projectId = state.gce.projectId || state.gcs.projectId;
   const zone = state.gce.zone || 'us-central1-a';
@@ -213,59 +227,42 @@ export async function createGceInstance(
   console.info(`[SAP Telemetry Wizard] ${log1}`);
 
   try {
-    const res = await fetch(
-      `https://compute.googleapis.com/compute/v1/projects/${encodeURIComponent(projectId)}/zones/${encodeURIComponent(zone)}/instances`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        },
-        body: JSON.stringify({
-          name: vmName,
-          machineType: `zones/${zone}/machineTypes/${machineType}`,
-          disks: [
-            {
-              boot: true,
-              autoDelete: true,
-              initializeParams: {
-                sourceImage: `projects/${imageProject}/global/images/family/${imageFamily}`,
-                diskSizeGb: String(state.gce.diskSizeGb || 50)
-              }
-            }
-          ],
-          networkInterfaces: [
-            {
-              network: `global/networks/${network}`,
-              subnetwork: `regions/${region}/subnetworks/${subnetwork}`,
-              accessConfigs: state.gce.enableExternalIP ? [
-                {
-                  type: 'ONE_TO_ONE_NAT',
-                  name: 'External NAT'
-                }
-              ] : []
-            }
-          ],
-          serviceAccounts: [
-            {
-              email: serviceAccount,
-              scopes: ['https://www.googleapis.com/auth/cloud-platform']
-            }
-          ],
-          metadata: {
-            items: [
-              {
-                key: 'startup-script',
-                value: startupScript
-              }
-            ]
-          },
-          tags: {
-            items: state.gce.tags || ['sap-telemetry', 'secops-collector']
+    const target = resolveGcpApiTarget(
+        `https://compute.googleapis.com/compute/v1/projects/${
+            encodeURIComponent(
+                projectId)}/zones/${encodeURIComponent(zone)}/instances`,
+        userToken);
+
+    const res = await fetch(target.url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', ...target.headers},
+      body: JSON.stringify({
+        name: vmName,
+        machineType: `zones/${zone}/machineTypes/${machineType}`,
+        disks: [{
+          boot: true,
+          autoDelete: true,
+          initializeParams: {
+            sourceImage:
+                `projects/${imageProject}/global/images/family/${imageFamily}`,
+            diskSizeGb: String(state.gce.diskSizeGb || 50)
           }
-        })
-      }
-    );
+        }],
+        networkInterfaces: [{
+          network: `global/networks/${network}`,
+          subnetwork: `regions/${region}/subnetworks/${subnetwork}`,
+          accessConfigs: state.gce.enableExternalIP ?
+              [{type: 'ONE_TO_ONE_NAT', name: 'External NAT'}] :
+              []
+        }],
+        serviceAccounts: [{
+          email: serviceAccount,
+          scopes: ['https://www.googleapis.com/auth/cloud-platform']
+        }],
+        metadata: {items: [{key: 'startup-script', value: startupScript}]},
+        tags: {items: state.gce.tags || ['sap-telemetry', 'secops-collector']}
+      })
+    });
 
     if (res.ok || res.status === 409) {
       if (res.status === 409) {
@@ -273,7 +270,8 @@ export async function createGceInstance(
         logs.push(msg);
         console.info(`[SAP Telemetry Wizard] ${msg}`);
       } else {
-        const data = await res.json();
+        const data =
+            await res.json().catch(() => ({name: 'Operation in progress'}));
         const msg = `[OK] GCE Instance "${vmName}" provisioned successfully live in Google Cloud Console! (Operation: ${data.name || 'Done'})`;
         logs.push(msg);
         console.info(`[SAP Telemetry Wizard] ${msg}`);
@@ -300,28 +298,18 @@ export async function createGceInstance(
  * Polls serial port 1 console output from the specified GCE VM instance.
  */
 export async function getGceSerialPortOutput(
-  projectId: string,
-  zone: string,
-  instanceName: string,
-  startOffset?: number
-): Promise<{ contents: string; nextOffset: number }> {
+    projectId: string, zone: string, instanceName: string, startOffset?: number,
+    userToken?: string): Promise<{contents: string; nextOffset: number}> {
   try {
-    const token = await getGcpAccessToken();
-    if (!token) {
-      return { contents: '', nextOffset: startOffset || 0 };
-    }
-
-    let url = `https://compute.googleapis.com/compute/v1/projects/${projectId}/zones/${zone}/instances/${instanceName}/serialPort?port=1`;
+    let rawUrl = `https://compute.googleapis.com/compute/v1/projects/${
+        projectId}/zones/${zone}/instances/${instanceName}/serialPort?port=1`;
     if (startOffset !== undefined && startOffset > 0) {
-      url += `&start=${startOffset}`;
+      rawUrl += `&start=${startOffset}`;
     }
 
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
+    const target = resolveGcpApiTarget(rawUrl, userToken);
+    const res =
+        await fetch(target.url, {method: 'GET', headers: {...target.headers}});
 
     if (!res.ok) {
       return { contents: '', nextOffset: startOffset || 0 };

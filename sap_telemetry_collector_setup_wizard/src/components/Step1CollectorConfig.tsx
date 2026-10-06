@@ -224,9 +224,13 @@ export const Step1CollectorConfig: React.FC<Props> = ({ collector, onChange, pro
                 Bindplane Port <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                value={collector.bindplanePort !== undefined ? String(collector.bindplanePort) : ''}
-                onChange={(e) => updateGlobal('bindplanePort', e.target.value)}
+                type="number"
+                value={collector.bindplanePort ?? ''}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const num = Number(val);
+                  updateGlobal('bindplanePort', val === '' ? '' : (Number.isInteger(num) ? num : val));
+                }}
                 placeholder="4317"
                 className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#1A73E8] focus:border-[#1A73E8] outline-none font-mono font-semibold"
               />
