@@ -274,3 +274,53 @@ class TestIngestMethod(unittest.TestCase):
 
     with self.assertRaises(Exception):
       ingest.get_reference_list("test")
+
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.ingest.initialize_http_session")
+  def test_ingest_with_us_region_uses_correct_url(
+      self, mocked_initialize_http_session
+  ):
+    """Test case to verify url generated when region is 'us' during ingest."""
+    original_value = ingest.REGION
+    ingest.REGION = "us"
+    try:
+      mock_session = mock.MagicMock()
+      mock_response = mock.MagicMock()
+      mock_response.json.return_value = {}
+      mock_session.request.return_value = mock_response
+      mocked_initialize_http_session.return_value = mock_session
+
+      ingest.ingest(["log_data"], "log_type")
+
+      mock_session.request.assert_called_once_with(
+          "POST",
+          "https://malachiteingestion-pa.googleapis.com/v2/unstructuredlogentries:batchCreate",
+          json=mock.ANY,
+          headers={"Content-Type": "application/json"},
+      )
+    finally:
+      ingest.REGION = original_value
+
+  @mock.patch(f"{INGESTION_SCRIPTS_PATH}.ingest.initialize_http_session")
+  def test_ingest_with_non_us_region_uses_correct_url(
+      self, mocked_initialize_http_session
+  ):
+    """Test case to verify url generated when region is not 'us' during ingest."""
+    original_value = ingest.REGION
+    ingest.REGION = "eu"
+    try:
+      mock_session = mock.MagicMock()
+      mock_response = mock.MagicMock()
+      mock_response.json.return_value = {}
+      mock_session.request.return_value = mock_response
+      mocked_initialize_http_session.return_value = mock_session
+
+      ingest.ingest(["log_data"], "log_type")
+
+      mock_session.request.assert_called_once_with(
+          "POST",
+          "https://eu-malachiteingestion-pa.googleapis.com/v2/unstructuredlogentries:batchCreate",
+          json=mock.ANY,
+          headers={"Content-Type": "application/json"},
+      )
+    finally:
+      ingest.REGION = original_value

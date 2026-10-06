@@ -98,7 +98,7 @@ def get_and_ingest_events(
     try:
       for domain in domain_list:
         data = client.hget(domain, "value")
-        if data or (domain in allow_list_domains):
+        if data or (domain in allow_list_domains):  # pyrefly: ignore[not-iterable]
           temp_domains_list.remove(domain)
     except Exception as error:
       raise RuntimeError(f"Error in Connecting to Redis: {error}") from error
@@ -167,7 +167,7 @@ def get_and_ingest_events(
         continue
       if function_mode == "monitoring_domain":
         val["monitor_domain"] = True
-        val["timestamp"] = timestamp_monitoring_list  # pylint: disable=undefined-variable
+        val["timestamp"] = timestamp_monitoring_list  # pylint: disable=undefined-variable  # pyrefly: ignore[unbound-name]
         val["monitoring_domain_list_name"] = reference_list_name
       principal_hostname = val.get("domain")
       if (
@@ -296,14 +296,14 @@ def add_domains_to_redis(redis_domain_list: List[Dict[str, str]]):
     if data_to_cache.get("evidence"):
       del data_to_cache["evidence"]
     try:
-      client.hmset(domain, data_to_cache)
+      client.hmset(domain, data_to_cache)  # pyrefly: ignore[bad-argument-type]
       if evidence == "provisional":
         ttl = int(provisional_ttl) * 86400  # no of seconds in a day = 86400
       else:
         ttl = int(non_provisional_ttl) * 86400
 
       # Set the TTL for the key
-      client.expire(domain, ttl)
+      client.expire(domain, ttl)  # pyrefly: ignore[bad-argument-type]
     except Exception as e:
       utils.cloud_logging(
           "Error occurred while storing domains in the memory store."
@@ -387,11 +387,11 @@ def generate_dummy_events(
     temp_event = {"timestamp": current_timestamp}
     if param_type == "allow_list":
       temp_event["domain"] = field
-      temp_event["allow_domain"] = True
+      temp_event["allow_domain"] = True  # pyrefly: ignore[bad-assignment]
       temp_event["allow_list_name"] = reference_list_name
     elif param_type == "monitoring_tags":
       temp_event["tag_name"] = field
-      temp_event["monitor_tag"] = True
+      temp_event["monitor_tag"] = True  # pyrefly: ignore[bad-assignment]
       temp_event["monitoring_tag_list_name"] = reference_list_name
     dummy_event_list.append(temp_event)
   return dummy_event_list

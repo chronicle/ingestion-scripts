@@ -144,7 +144,7 @@ def ingest(data: list[Any], log_type: str):
     # A batch of logs is prepared for ingestion into the Chronicle.
     _send_logs_to_chronicle(
         http_session,
-        body,
+        body,  # pyrefly: ignore[bad-argument-type]
         REGION,
     )
     body["entries"].clear()
@@ -152,7 +152,7 @@ def ingest(data: list[Any], log_type: str):
   # If the data received to ingest is below 0.95MB, the above while loop is
   # yet to send the data to Chronicle. Hence, sending the data now.
   if body["entries"]:
-    _send_logs_to_chronicle(http_session, body, REGION)
+    _send_logs_to_chronicle(http_session, body, REGION)  # pyrefly: ignore[bad-argument-type]
 
 
 def _send_logs_to_chronicle(

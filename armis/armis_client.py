@@ -182,7 +182,7 @@ class ArmisClient:
         on the poll interval.
     """
     current_time = datetime.datetime.now(datetime.timezone.utc)
-    time_frame_seconds = round((current_time - self.start_time).total_seconds())
+    time_frame_seconds = round((current_time - self.start_time).total_seconds())  # pyrefly: ignore[unsupported-operation]
     time_frame_string = f' timeFrame:"{time_frame_seconds} seconds"'
     return time_frame_string
 
@@ -267,7 +267,7 @@ class ArmisClient:
       # If response is not in a JSON format, raise HTTP error.
       except requests.JSONDecodeError as error:
         raise requests.HTTPError(
-            f"{response.status_code}: {response.reason}"
+            f"{response.status_code}: {response.reason}"  # pyrefly: ignore[unbound-name]
         ) from error
 
     # If status code is other than 200 raise HTTPError.

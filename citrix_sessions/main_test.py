@@ -107,6 +107,40 @@ class TestAccessToken(unittest.TestCase):
     self.assertEqual(actual_access_token, expected_access_token)
 
 
+class TestCreateNewSession(unittest.TestCase):
+  """Test cases to verify "create_new_session" functionality."""
+
+  @mock.patch("{}main.utils.get_env_var".format(SCRIPT_PATH))
+  @mock.patch("{}main.auth.OAuthClientCredentialsAuth".format(SCRIPT_PATH))
+  def test_create_new_session_success(self, mock_oauth, mock_get_env_var_func):
+    """Test case to verify create_new_session works on success."""
+    with mock.patch.object(
+        main, "CUSTOMER_ID", "test_customer"
+    ), mock.patch.object(main, "URL_DOMAIN", "test_domain"):
+      mock_get_env_var_func.side_effect = [
+          "val_CITRIX_CLIENT_ID",
+          "test_secret",
+      ]
+
+      mock_auth_instance = mock.Mock()
+      mock_session = mock.Mock()
+      mock_auth_instance.session = mock_session
+      mock_oauth.return_value = mock_auth_instance
+
+      session = main.create_new_session()
+
+      mock_get_env_var_func.assert_has_calls([
+          mock.call(main.ENV_CITRIX_CLIENT_ID),
+          mock.call(main.ENV_CITRIX_CLIENT_SECRET, is_secret=True),
+      ])
+      mock_oauth.assert_called_once_with(
+          "https://test_domain/cctrustoauth2/test_customer/tokens/clients",
+          "val_CITRIX_CLIENT_ID",
+          "test_secret",
+      )
+      self.assertEqual(session, mock_session)
+
+
 @mock.patch(
     "{}main.utils.get_env_var".format(SCRIPT_PATH),
     side_effect=mock_get_env_var)
@@ -115,6 +149,23 @@ class TestAccessToken(unittest.TestCase):
 @mock.patch("{}main.requests.get".format(SCRIPT_PATH))
 class TestCitrixSessions(unittest.TestCase):
   """Test cases to verify Citrix Sessions script."""
+
+  def test_main_returns_success_message(
+      self,
+      mocked_get,
+      mocked_create_session,
+      unused_mocked_ingest,
+      unused_mocked_get_env_var,
+  ):
+    """Test case to verify that main returns success message on successful execution."""
+    mocked_create_session.return_value = get_mock_session()
+    response = get_mock_response()
+    response.json.return_value = {"value": []}
+    mocked_get.return_value = response
+
+    result = main.main(req="")
+
+    self.assertEqual(result, "Ingestion completed.")
 
   @mock.patch("builtins.print")
   def test_http_error(self, mocked_print, mocked_get, mocked_create_session,

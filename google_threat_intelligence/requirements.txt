@@ -1,0 +1,6 @@
+requests==2.32.3
+google-cloud-secret-manager==2.22.0
+google-cloud-storage==2.19.0
+google-auth==2.30.0
+google-cloud-resource-manager==1.13.0
+immutabledict

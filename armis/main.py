@@ -92,7 +92,7 @@ def filter_and_add_link_in_vulnerabilities(
     try:
       # Get the published date from the response.
       published_date = datetime.datetime.strptime(
-          vulnerability.get("publishedDate"), TIME_FORMAT
+          vulnerability.get("publishedDate"), TIME_FORMAT  # pyrefly: ignore[bad-argument-type]
       ).timestamp()
     except Exception:  # pylint: disable=broad-except
       continue
