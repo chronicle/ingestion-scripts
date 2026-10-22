@@ -163,7 +163,14 @@ def get_and_ingest_logs(
     data = response.get("data", {})
 
     if first_run:
-      logs_need_to_fetch = data.get("total", 0)
+      total_raw = data.get("total", 0)
+      try:
+        # Armis API may return the string "Many" for large datasets.
+        # In that case, keep logs_need_to_fetch as infinity so pagination
+        # continues naturally until received offset is None.
+        logs_need_to_fetch = int(total_raw)
+      except (ValueError, TypeError):
+        logs_need_to_fetch = float("inf")
       first_run = False
 
     offset = data.get("next")

@@ -14,9 +14,10 @@ Furthermore, the collected data will be ingested into Chronicle and parsed by co
 
 | Variable | Description | Required | Default | Secret |
 | --- | --- | --- | --- | --- |
+| CHRONICLE_PROJECT_NUMBER | Google Cloud Project Number where Chronicle instance is hosted. | Yes | - | No |
 | CHRONICLE_CUSTOMER_ID | Chronicle customer ID. | Yes | - | No |
-| CHRONICLE_REGION | Chronicle region. | Yes | us | No |
-| CHRONICLE_SERVICE_ACCOUNT | Contents of the Chronicle ServiceAccount JSON file. | Yes | - | Yes |
+| CHRONICLE_REGION | Chronicle region (e.g. `us`, `europe`, `asia-southeast1`). | Yes | us | No |
+| CHRONICLE_SERVICE_ACCOUNT | Secret path of the Chronicle ServiceAccount JSON file. | Yes | - | Yes |
 | CHRONICLE_NAMESPACE | The namespace that the Chronicle logs are labeled with. | No | - | No |
 | POLL_INTERVAL | Frequency interval at which the function executes to get additional log data (in minutes). This duration must be the same as the Cloud Scheduler job interval. | Yes | 10 | No |
 | ARMIS_SERVER_URL | Server URL of Armis platform. | Yes | - | No |
@@ -60,16 +61,24 @@ setting the `CHRONICLE_NAMESPACE` environment variable.
 Execute the following command from inside the previously created directory to 
 deploy the cloud function.
 
+```bash
+gcloud functions deploy <FUNCTION NAME> --gen2 --entry-point main --trigger-http --runtime python313 --timeout 1140s --memory 512MB  --env-vars-file .env.yml
 ```
-gcloud functions deploy <FUNCTION NAME> --gen2 --entry-point main --trigger-http --runtime python39 --env-vars-file .env.yml
-```
+
+On executing the above command, it will ask to select a **Region** from the
+list. Select the region where this function needs to be deployed.
+
+> **Note:** The script supports Python versions from **Python 3.10 up to Python
+> 3.13**. If you wish to use an earlier supported Python runtime, replace
+> `--runtime python313` with `--runtime python310`, `--runtime python311`, or
+> `--runtime python312` in the command above.
 
 ### Cloud Function Default Specifications
 
 | Variable | Default Value | Description |
 | --- | --- | --- |
-| Memory | 256 MB | Allocated memory for a specific cloud function. |
-| Timeout | 60 seconds | Time Interval for the termination of a cloud function. |
+| Memory | 512 MB | Allocated memory for a specific cloud function. |
+| Timeout | 1140 seconds | Time Interval for the termination of a cloud function. |
 | Region | us-central1 | Region for a cloud function. |
 | Minimum instances | 0 | Minimum number of instance for a cloud function. |
 | Maximum instances | 100 | Maximum number of instances for a cloud function. |
