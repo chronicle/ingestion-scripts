@@ -11,7 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
+# pylint: disable=line-too-long
+# pylint: disable=g-importing-member
+# pylint: disable=invalid-name
+# pylint: disable=g-multiple-import
+# pylint: disable=unused-argument
+# pylint: disable=g-import-not-at-top
+# pylint: disable=g-bad-import-order
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=g-bad-exception-name
+
+
 """Unittest cases for Armis ingestion scripts."""
 
 import datetime
@@ -22,8 +34,57 @@ from unittest import mock
 
 import requests
 
+
+class MockUtils:
+  """Mock utils module."""
+
+  @classmethod
+  def get_env_var(
+      cls, name: str, required: bool = True, default=None, is_secret=False
+  ):
+    """Mock get_env_var function."""
+    return "mock_value"
+
+  @classmethod
+  def get_last_run_at(cls):
+    """Mock get_last_run_at function."""
+
+
+class MockIngestV1:
+  """Mock ingest_v1 module."""
+
+  @classmethod
+  def ingest(cls, data, label, **kwargs):
+    """Mock ingest function."""
+
+
+class MockStatus:
+  """Mock status module."""
+
+  # Real values are required since armis_client compares status codes.
+  STATUS_OK = 200
+  STATUS_UNAUTHORIZED = 401
+  STATUS_INTERNAL_SERVER_ERROR = 500
+
+
+class MockCommon:
+  """Mock common module."""
+
+  utils = MockUtils()
+  ingest_v1 = MockIngestV1()
+  status = MockStatus()
+
+
+mock_common = MockCommon()
+mock_utils = MockUtils()
+mock_ingest_v1 = MockIngestV1()
+mock_status = MockStatus()
+
 INGESTION_SCRIPTS_PATH = ""
-sys.modules["common.ingest"] = mock.Mock()
+sys.modules["common"] = mock_common
+sys.modules["common.utils"] = mock_utils
+sys.modules["common.ingest_v1"] = mock_ingest_v1
+sys.modules["common.status"] = mock_status
 
 import main
 
@@ -152,7 +213,7 @@ class MockMultiProcessPool:
 @mock.patch(
     f"{INGESTION_SCRIPTS_PATH}main.utils.get_last_run_at",
 )
-@mock.patch(f"{INGESTION_SCRIPTS_PATH}main.ingest.ingest")
+@mock.patch(f"{INGESTION_SCRIPTS_PATH}main.ingest_v1.ingest")
 @mock.patch(f"{INGESTION_SCRIPTS_PATH}main.armis_client.time.sleep")
 @mock.patch(f"{INGESTION_SCRIPTS_PATH}main.armis_client.requests.request")
 @mock.patch.object(

@@ -20,7 +20,7 @@ from typing import Any, Dict, List
 from urllib import parse
 
 import armis_client
-from common import ingest
+from common import ingest_v1
 from common import utils
 
 # Environment variable constants.
@@ -195,7 +195,7 @@ def get_and_ingest_logs(
     # Ingest result into the Chronicle.
     if logs:
       try:
-        ingest.ingest(logs, chronicle_label)
+        ingest_v1.ingest(logs, chronicle_label)
       except Exception as error:
         raise RuntimeError(
             f"Unable to push data to Chronicle. {error}"
