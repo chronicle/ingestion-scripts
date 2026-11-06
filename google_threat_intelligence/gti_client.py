@@ -1027,7 +1027,16 @@ class GoogleThreatIntelligenceUtility:
             required=True,
         )
         resource_name = f"projects/{chronicle_project_number}"
-        policy = client.get_iam_policy(request={"resource": resource_name})
+        # Request policy version 3 so roles granted with IAM conditions are
+        # returned under their real role name. With the default version 1,
+        # conditional bindings come back as "<role>_withcond_<hash>" and are
+        # never matched below.
+        policy = client.get_iam_policy(
+            request={
+                "resource": resource_name,
+                "options": {"requested_policy_version": 3},
+            }
+        )
 
         service_account_email = requests.get(
             "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email",
@@ -1047,8 +1056,10 @@ class GoogleThreatIntelligenceUtility:
               " sufficient permissions."
           )
           utils.cloud_logging(
-              "Service account - %s does not have sufficient permissions.",
-              service_account_email
+              f"Service account - {service_account_email} does not have"
+              " sufficient permissions. Missing roles:"
+              f" {', '.join(sorted(missing_permissions))}.",
+              severity="ERROR",
           )
           raise GCPPermissionDeniedError(
               message=error_msg,
