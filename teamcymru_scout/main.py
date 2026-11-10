@@ -78,13 +78,13 @@ def add_ips_to_redis(redis_ips_list: List[Dict[str, str]]):
   for data_to_cache in redis_ips_list:
     ip = data_to_cache.get("value")
     try:
-      redis_client.hset(ip, mapping=data_to_cache)  # pyrefly: ignore[bad-argument-type]
+      redis_client.hset(ip, mapping=data_to_cache)  # pyrefly: ignore[no-matching-overload]
       ttl = (
           int(provisional_ttl) * 86400
       )  # no of seconds in a day = 86400  # noqa:E501
 
       # Set the TTL for the key
-      redis_client.expire(ip, ttl)  # pyrefly: ignore[bad-argument-type]
+      redis_client.expire(ip, ttl)  # pyrefly: ignore[no-matching-overload]
     except Exception as e:   # pylint: disable=broad-except
       utils.cloud_logging(
           f"Error occurred while storing enriched ip in the memory "

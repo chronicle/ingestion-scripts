@@ -296,14 +296,14 @@ def add_domains_to_redis(redis_domain_list: List[Dict[str, str]]):
     if data_to_cache.get("evidence"):
       del data_to_cache["evidence"]
     try:
-      client.hmset(domain, data_to_cache)  # pyrefly: ignore[bad-argument-type]
+      client.hmset(domain, data_to_cache)  # pyrefly: ignore[no-matching-overload]
       if evidence == "provisional":
         ttl = int(provisional_ttl) * 86400  # no of seconds in a day = 86400
       else:
         ttl = int(non_provisional_ttl) * 86400
 
       # Set the TTL for the key
-      client.expire(domain, ttl)  # pyrefly: ignore[bad-argument-type]
+      client.expire(domain, ttl)  # pyrefly: ignore[no-matching-overload]
     except Exception as e:
       utils.cloud_logging(
           "Error occurred while storing domains in the memory store."
