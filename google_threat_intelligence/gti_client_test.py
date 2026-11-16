@@ -27,7 +27,7 @@ import sys
 from datetime import timezone
 import unittest
 from unittest import mock
-from mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 import threading
 
 INGESTION_SCRIPTS_PATH = ""
