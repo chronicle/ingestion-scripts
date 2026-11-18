@@ -1,0 +1,40 @@
+name: Ingest Thinkst Canary Audit Logs into Chronicle
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r chronicle-scripts/thinkst-canary-chronicle-ingestor/requirements.txt
+
+      - name: Write Chronicle service account key to file
+        shell: bash
+        run: |
+          echo "${{ secrets.CHRONICLE_CREDENTIALS_JSON }}" | base64 --decode > chronicle_sa.json
+
+      - name: Run Thinkst Canary ingestion script
+        env:
+          PYTHONPATH: chronicle-scripts
+          CHRONICLE_CUSTOMER_ID: ${{ secrets.CHRONICLE_CUSTOMER_ID }}
+          CHRONICLE_REGION: ${{ secrets.CHRONICLE_REGION }}
+          GOOGLE_APPLICATION_CREDENTIALS: chronicle_sa.json
+          CHRONICLE_SERVICE_ACCOUNT: chronicle_sa.json
+          CHRONICLE_NAMESPACE: ${{ secrets.CHRONICLE_NAMESPACE }}
+          CANARY_CONSOLE_ID: ${{ secrets.CANARY_CONSOLE_ID }}
+          CANARY_AUTH_TOKEN: ${{ secrets.CANARY_AUTH_TOKEN }}
+        run: |
+          python chronicle-scripts/thinkst-canary-chronicle-ingestor/main.py --creds-file chronicle_sa.json
+
